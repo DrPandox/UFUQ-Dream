@@ -1,0 +1,12 @@
+{
+  "rules": {
+    "config": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+    "guests": {
+      ".read": true,
+      ".write": "auth != null"
+    }
+  }
+}
