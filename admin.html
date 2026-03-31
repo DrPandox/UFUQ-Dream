@@ -62,6 +62,18 @@ body { font-family: 'Segoe UI', Tahoma, Arial, sans-serif; background:#1a0a00; c
 .add-btn { background:#3a2800; border:1px solid #c8a45a; color:#c8a45a; padding:9px 18px; border-radius:8px; cursor:pointer; font-size:14px; white-space:nowrap; }
 .add-btn:hover { background:#4a3400; }
 
+/* Archive */
+.arc-grid-admin { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:10px; margin-top:14px; }
+.arc-thumb-card { background:#1a0a00; border:1px solid #3a2010; border-radius:10px; overflow:hidden; position:relative; }
+.arc-thumb-card img { width:100%; height:120px; object-fit:cover; display:block; background:#2a1000; }
+.arc-thumb-info { padding:8px 10px; }
+.arc-thumb-info .arc-caption { font-size:12px; color:#c0a080; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.arc-thumb-info .arc-year-tag { font-size:11px; color:#6a4020; }
+.arc-thumb-del { position:absolute; top:6px; left:6px; background:rgba(20,0,8,0.75); border:1px solid #5a3a10; border-radius:6px; color:#e07070; font-size:12px; padding:3px 8px; cursor:pointer; }
+.arc-thumb-del:hover { background:rgba(80,0,0,0.85); }
+.arc-type-badge { position:absolute; top:6px; right:6px; background:rgba(20,0,8,0.75); border:1px solid #3a2010; border-radius:5px; font-size:10px; color:#8a6040; padding:2px 7px; }
+.arc-video-placeholder { width:100%; height:120px; background:#1a0500; display:flex; align-items:center; justify-content:center; color:#4a2810; font-size:28px; }
+
 .toggle-row { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
 .toggle-label { font-size:14px; color:#c0a080; }
 /* Simple toggle switch */
@@ -213,6 +225,43 @@ input:checked + .slider:before { transform:translateX(20px); background:#f2d898;
       </div>
     </div>
 
+    <!-- ARCHIVE -->
+    <div class="section-card">
+      <h3>أرشيف الصور والفيديو</h3>
+      <p style="font-size:12px;color:#6a4020;margin-bottom:16px;line-height:1.8;">أضف روابط صور أو فيديوهات من الدورات السابقة. تظهر للزوار في صفحة الأرشيف.</p>
+
+      <div class="grid2">
+        <div class="field-row">
+          <label>رابط الصورة / الفيديو</label>
+          <input type="url" id="arc-url" placeholder="https://..." style="direction:ltr;text-align:left;" onkeyup="if(event.key==='Enter')addArchiveItem()">
+        </div>
+        <div class="field-row">
+          <label>رابط الصورة المصغرة (للفيديو فقط)</label>
+          <input type="url" id="arc-thumb" placeholder="https://... (اختياري)" style="direction:ltr;text-align:left;">
+        </div>
+        <div class="field-row">
+          <label>النوع</label>
+          <select id="arc-type">
+            <option value="image">صورة</option>
+            <option value="video">فيديو</option>
+          </select>
+        </div>
+        <div class="field-row">
+          <label>السنة</label>
+          <input type="number" id="arc-year" placeholder="2025" min="2020" max="2030">
+        </div>
+        <div class="field-row" style="grid-column:1/-1">
+          <label>وصف / تعليق (اختياري)</label>
+          <input type="text" id="arc-caption" placeholder="وصف مختصر للصورة أو اللحظة">
+        </div>
+      </div>
+
+      <button class="add-btn" onclick="addArchiveItem()" style="margin-bottom:20px;">+ إضافة للأرشيف</button>
+      <div id="arc-add-err" style="color:#e07070;font-size:12px;margin-bottom:10px;min-height:16px;"></div>
+
+      <div class="arc-grid-admin" id="arc-grid-admin"></div>
+    </div>
+
   </div>
 </div>
 
@@ -255,6 +304,7 @@ auth.onAuthStateChanged(user => {
     document.getElementById('admin-email').textContent = user.email;
     loadConfig();
     loadGuests();
+    loadArchive();
   } else {
     document.getElementById('login-screen').style.display = 'flex';
     document.getElementById('dashboard').style.display = 'none';
@@ -355,6 +405,76 @@ function addGuest() {
 function removeGuest(name) {
   db.ref('guests/' + name).remove();
 }
+
+// ─── ARCHIVE ───
+function loadArchive() {
+  db.ref('archive').on('value', snap => {
+    const data = snap.val() || {};
+    renderArchiveAdmin(data);
+  });
+}
+
+function renderArchiveAdmin(data) {
+  const grid = document.getElementById('arc-grid-admin');
+  grid.innerHTML = '';
+  const items = Object.entries(data).sort((a, b) => (b[1].addedAt || 0) - (a[1].addedAt || 0));
+  if (items.length === 0) {
+    grid.innerHTML = '<p style="font-size:12px;color:#4a2810;grid-column:1/-1;">لا يوجد محتوى في الأرشيف بعد.</p>';
+    return;
+  }
+  items.forEach(([key, item]) => {
+    const card = document.createElement('div');
+    card.className = 'arc-thumb-card';
+    const isVideo = item.type === 'video';
+    const thumb = item.thumbnail || (isVideo ? '' : item.url);
+    card.innerHTML = `
+      ${thumb
+        ? `<img src="${escAttr(thumb)}" alt="" onerror="this.style.display='none';this.nextElementSibling&&(this.nextElementSibling.style.display='flex')">`
+        : ''}
+      ${isVideo && !thumb ? `<div class="arc-video-placeholder">▶</div>` : ''}
+      <div class="arc-type-badge">${isVideo ? 'فيديو' : 'صورة'}</div>
+      <button class="arc-thumb-del" onclick="removeArchiveItem('${escAttr(key)}')">حذف</button>
+      <div class="arc-thumb-info">
+        <div class="arc-caption">${escHtml(item.caption || '—')}</div>
+        <div class="arc-year-tag">${item.year || ''}</div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function addArchiveItem() {
+  const url     = document.getElementById('arc-url').value.trim();
+  const thumb   = document.getElementById('arc-thumb').value.trim();
+  const type    = document.getElementById('arc-type').value;
+  const year    = Number(document.getElementById('arc-year').value) || null;
+  const caption = document.getElementById('arc-caption').value.trim();
+  const errEl   = document.getElementById('arc-add-err');
+
+  if (!url) { errEl.textContent = 'الرجاء إدخال رابط الصورة أو الفيديو'; return; }
+  errEl.textContent = '';
+
+  const key = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  const item = { url, type, addedAt: Date.now() };
+  if (thumb)   item.thumbnail = thumb;
+  if (year)    item.year      = year;
+  if (caption) item.caption   = caption;
+
+  db.ref('archive/' + key).set(item).then(() => {
+    document.getElementById('arc-url').value     = '';
+    document.getElementById('arc-thumb').value   = '';
+    document.getElementById('arc-caption').value = '';
+    document.getElementById('arc-year').value    = '';
+  });
+}
+
+function removeArchiveItem(key) {
+  if (!confirm('حذف هذا العنصر من الأرشيف؟')) return;
+  db.ref('archive/' + key).remove();
+}
+
+function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escAttr(s) { return String(s||'').replace(/"/g,'&quot;'); }
 </script>
 </body>
 </html>
