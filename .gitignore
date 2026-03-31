@@ -1,0 +1,9 @@
+# ── Backend (runs on local server — never push to GitHub) ──
+backend/
+
+# ── Admin panel (served by local Express server) ──
+admin.html
+
+# ── Misc ──
+.DS_Store
+Thumbs.db

@@ -313,7 +313,16 @@ body {
 // ══════════════════════════════════════════════════════
 //  BACKEND URL — change to your production URL when deploying
 // ══════════════════════════════════════════════════════
-const BACKEND_URL = 'http://localhost:3000';
+// ══ BACKEND URL ════════════════════════════════════════
+//  This page runs on GitHub Pages. The backend runs on
+//  your local server. Set this to your server's LAN IP
+//  or hostname so guests on the same network can reach it.
+//
+//  Examples:
+//    http://192.168.1.100:3000   ← your server's LAN IP
+//    http://server.local:3000    ← if you set a hostname
+//
+const BACKEND_URL = 'http://192.168.1.100:3000'; // ← CHANGE THIS
 
 // ══════════════════════════════════════════════════════
 const FIREBASE_CONFIG = {
