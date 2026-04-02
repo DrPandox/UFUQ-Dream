@@ -277,8 +277,9 @@ body {
     <p class="gate-prompt">سجّل بياناتك للدخول</p>
 
     <div class="role-row">
-      <button class="role-btn" id="role-student" onclick="setRole('student')">خريج</button>
+      <button class="role-btn" id="role-student" onclick="setRole('student')">طالب</button>
       <button class="role-btn" id="role-parent"  onclick="setRole('parent')">ولي أمر</button>
+      <button class="role-btn" id="role-visitor" onclick="setRole('visitor')">زائر</button>
     </div>
 
     <div class="gate-input-wrap">
@@ -303,7 +304,7 @@ body {
   <!-- Silhouettes -->
   <div class="gate-silhouettes">
     <div class="gate-horizon"></div>
-    <img src="assets/student.png" alt="خريجون">
+    <img src="assets/student.png" alt="طالبون">
   </div>
 </div>
 
@@ -360,6 +361,7 @@ function setRole(role) {
   selectedRole = role;
   document.getElementById('role-student').classList.toggle('active', role === 'student');
   document.getElementById('role-parent').classList.toggle('active',  role === 'parent');
+  document.getElementById('role-visitor').classList.toggle('active', role === 'visitor');
 }
 
 function showErr(msg, duration) {
@@ -372,7 +374,7 @@ function showErr(msg, duration) {
 function enterGate() {
   const name  = document.getElementById('guest-input').value.trim();
   const phone = document.getElementById('guest-phone').value.trim();
-  if (!selectedRole) { showErr('يرجى اختيار خريج أو ولي أمر'); return; }
+  if (!selectedRole) { showErr('يرجى اختيار دورك للدخول'); return; }
   if (!name)  { showErr('يرجى كتابة اسمك للدخول'); return; }
   if (!phone) { showErr('يرجى إدخال رقم الجوال'); return; }
   if (!phone.startsWith('07')) { showErr('رقم الجوال يجب أن يبدأ بـ 07'); return; }
