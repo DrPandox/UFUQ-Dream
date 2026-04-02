@@ -7,12 +7,13 @@
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mokhtarbsaid/rare-arabic-fonts/theyearofthecamel/all.min.css">
 
 <style>
 :root {
-  --f-display : 'Amiri',"Geeza Pro","Traditional Arabic","Arabic Typesetting",Georgia,serif;
-  --f-body    : 'Cairo',"Geeza Pro","Arabic Typesetting",Tahoma,Arial,sans-serif;
+  --f-display : 'theyearofthecamel',"Amiri","Geeza Pro","Traditional Arabic","Arabic Typesetting",Georgia,serif;
+  --f-body    : 'theyearofthecamel','Cairo',"Geeza Pro","Arabic Typesetting",Tahoma,Arial,sans-serif;
   --bg        : #2a0312;
   --gold      : #c7a887;
   --gold-l    : #d9c4a4;
@@ -29,8 +30,7 @@ body {
   color: #faf7f2;
   font-family: var(--f-body);
   direction: rtl;
-  overflow: hidden;
-  height: 100%;
+  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -61,99 +61,32 @@ body {
 .page {
   position: relative; z-index: 2;
   width: 100%;
-  height: 100vh; height: 100svh;
-  overflow-y: scroll; overflow-x: hidden;
-  scroll-snap-type: y mandatory;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior-y: none;
 }
 
-/* Each section / footer = one full snap page */
-/* padding trick: max(min-padding, 50% - half-content-width) auto-centers content */
 .page > section, .page > footer {
-  height: 100vh; height: 100svh;
-  min-height: unset;
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  padding: 40px max(20px, calc(50% - 280px));
-  overflow: hidden;
+  padding: 80px max(20px, calc(50% - 280px));
   box-sizing: border-box;
   width: 100%;
-  position: relative;
 }
 
-/* ══ SECTION AMBIENT PARTICLES ══ */
-.sp {
-  position: absolute; inset: 0;
-  pointer-events: none; z-index: -1;
-  overflow: hidden;
-}
-/* Orb — blurred glowing circle that breathes */
-.sp-o {
-  position: absolute; border-radius: 50%;
-  background: radial-gradient(circle, var(--c, rgba(199,168,135,0.2)) 0%, transparent 70%);
-  animation: spFloat var(--t, 7s) var(--d, 0s) ease-in-out infinite;
-  will-change: transform;
-}
-@keyframes spFloat {
-  0%,100% { transform: translate(0,0) scale(1); }
-  33%     { transform: translate(var(--x1, 10px), var(--y1, -16px)) scale(1.08); }
-  66%     { transform: translate(var(--x2, -8px), var(--y2, -8px)) scale(0.94); }
-}
-/* Ring — expanding pulse ring (left/top are the center point) */
-.sp-r {
-  position: absolute; border-radius: 50%;
-  border: 1px solid var(--c, rgba(199,168,135,0.14));
-  transform: translate(-50%,-50%) scale(0.3);
-  animation: spRing var(--t, 3.5s) var(--d, 0s) ease-out infinite;
-  will-change: transform, opacity;
-}
-@keyframes spRing {
-  0%   { transform: translate(-50%,-50%) scale(0.3); opacity: 0.7; }
-  100% { transform: translate(-50%,-50%) scale(3.2); opacity: 0;   }
-}
-/* Spark — tiny twinkling dot */
-.sp-s {
-  position: absolute; border-radius: 50%;
-  background: var(--c, #c7a887);
-  animation: spSpark var(--t, 3s) var(--d, 0s) ease-in-out infinite;
-}
-@keyframes spSpark {
-  0%,100% { opacity: 0; transform: scale(0); }
-  45%,55% { opacity: var(--a, 0.65); transform: scale(1); }
-}
-/* Drift — tiny particle rising upward and fading */
-.sp-drift {
-  position: absolute; border-radius: 50%;
-  background: var(--c, rgba(199,168,135,0.38));
-  animation: spDrift var(--t, 6s) var(--d, 0s) linear infinite;
-}
-@keyframes spDrift {
-  0%   { transform: translateY(0) translateX(0); opacity: 0; }
-  8%   { opacity: 1; }
-  88%  { opacity: 0.5; }
-  100% { transform: translateY(-110px) translateX(var(--dx, 14px)); opacity: 0; }
+/* ══ AMBIENT CANVAS — single unified layer behind everything ══ */
+#ambientBg {
+  position: fixed; top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none; z-index: 1;
 }
 
-/* Hero keeps its own top/bottom padding */
-.page > .hero { padding: 64px max(28px, calc(50% - 280px)) 90px; }
+/* Hero full-screen with extra breathing room */
+.page > .hero { padding: 100px max(28px, calc(50% - 280px)) 100px; min-height: 100svh; }
 
 /* Content sections */
-.page > .sec { padding: 32px max(20px, calc(50% - 280px)); }
+.page > .sec { padding: 72px max(20px, calc(50% - 280px)); }
 
-/* Photo frame section can scroll internally */
-.page > .sec-frame {
-  overflow-y: auto;
-  justify-content: flex-start;
-  padding-top: 44px;
-  padding-bottom: 32px;
-  scroll-snap-stop: normal;
-}
-
-/* Hide decorative dividers — they are not snap pages */
-.page > .div-orn, .page > .div-dots { display: none; }
+/* Decorative dividers — visible again */
+.page > .div-orn { display: flex; padding: 0 max(20px, calc(50% - 280px)); }
+.page > .div-dots { display: block; padding: 0 max(20px, calc(50% - 280px)); text-align: center; }
 
 /* ══ SCROLL REVEAL — per-element animations ══ */
 .fs { opacity: 1; }
@@ -232,12 +165,12 @@ body {
 @keyframes hBobIn   { 0%{opacity:0;transform:translateX(-50%) translateY(12px);}
                       100%{opacity:0.32;transform:translateX(-50%) translateY(0);} }
 
-.hero-greeting  { position:relative;z-index:2; font-family: var(--f-display); font-size: 15px; color: rgba(199,168,135,0.82); margin-bottom: 10px;
+.hero-greeting  { position:relative;z-index:2; font-family: var(--f-display); font-size: 20px; color: rgba(199,168,135,0.82); margin-bottom: 10px;
                   animation: hFadeUp 0.9s 0.15s both ease; }
 .hero-orn       { position:relative;z-index:2; width: 150px; margin: 0 auto 22px;
                   transform-origin: center;
                   animation: hOrnExpand 0.9s 0.45s both ease; }
-.hero-ufuq      { position:relative;z-index:2; font-family: var(--f-body); font-size: 10px; letter-spacing: 5px; color: #c7a887; margin-bottom: 8px; font-weight: 600;
+.hero-ufuq      { position:relative;z-index:2; font-family: var(--f-body); font-size: 13px; letter-spacing: 5px; color: #c7a887; margin-bottom: 8px; font-weight: 600;
                   animation: hLetters 0.9s 0.65s both ease; }
 
 /* Title image with flare burst on entry */
@@ -260,19 +193,19 @@ body {
 
 .hero-title-img { width: clamp(230px, 62vw, 340px); display:block; margin:0 auto;
                   animation: hScaleIn 1.1s 0.85s both cubic-bezier(0.34,1.06,0.64,1); }
-.hero-sub       { position:relative;z-index:2; font-family: var(--f-body); font-size: 11px; letter-spacing: 3px; color: rgba(199,168,135,0.5); margin-bottom: 6px;
+.hero-sub       { position:relative;z-index:2; font-family: var(--f-body); font-size: 14px; letter-spacing: 3px; color: rgba(255,255,255,0.75); margin-bottom: 6px;
                   animation: hFadeUp 0.8s 1.15s both ease; }
-.hero-tagline   { position:relative;z-index:2; font-family: var(--f-display); font-size: 14px; color: rgba(250,247,242,0.4); font-style: italic;
+.hero-tagline   { position:relative;z-index:2; font-family: var(--f-display); font-size: 18px; color: rgba(255,255,255,0.8); font-style: italic;
                   animation: hFadeUp 0.8s 1.35s both ease; }
 .hero-line      { position:relative;z-index:2; width: 1px; height: 46px; background: linear-gradient(to bottom,transparent,rgba(199,168,135,0.38),transparent); margin: 24px auto;
                   transform-origin: top center;
                   animation: hLineH 0.7s 1.55s both ease; }
-.hero-poem      { position:relative;z-index:2; font-family: var(--f-display); font-size: 15.5px; line-height: 2.15; color: rgba(250,247,242,0.5); max-width: 272px;
+.hero-poem      { position:relative;z-index:2; font-family: var(--f-display); font-size: 20px; line-height: 2.15; color: rgba(255,255,255,0.88); max-width: 272px;
                   animation: hFadeUp 1.0s 1.75s both ease; }
 .hero-poem em   { color: #c7a887; font-style: normal; }
 .scroll-cue     { position: absolute; bottom: 22px; left: 50%; text-align: center;
                   animation: hBobIn 1.0s 2.4s both ease, bob 2.6s 3.4s ease-in-out infinite; }
-.scroll-cue p   { font-size: 10px; color: #c7a887; letter-spacing: 2px; margin-bottom: 4px; }
+.scroll-cue p   { font-size: 13px; color: #c7a887; letter-spacing: 2px; margin-bottom: 4px; }
 .scroll-cue svg { width: 18px; }
 
 /* ══ DIVIDERS ══ */
@@ -283,29 +216,29 @@ body {
 
 /* ══ SECTIONS ══ */
 .sec     { padding: 46px 20px; }
-.sec-lbl { font-family: var(--f-body); font-size: 10px; letter-spacing: 4px; color: #c7a887; opacity: 0.5; text-align: center; margin-bottom: 12px; font-weight: 600; }
-.sec-h   { font-family: var(--f-display); font-size: clamp(24px,6vw,30px); font-weight: 700; text-align: center; color: #d9c4a4; line-height: 1.35; margin-bottom: 20px; }
+.sec-lbl { font-family: var(--f-body); font-size: 13px; letter-spacing: 4px; color: #c7a887; opacity: 0.5; text-align: center; margin-bottom: 12px; font-weight: 600; }
+.sec-h   { font-family: var(--f-display); font-size: clamp(30px,7vw,40px); font-weight: 700; text-align: center; color: #d9c4a4; line-height: 1.35; margin-bottom: 20px; }
 
 .card { background: rgba(64,4,20,0.95); border: 1px solid rgba(199,168,135,0.14); border-radius: 16px; padding: 26px 20px; position: relative; overflow: hidden; }
 .card::before { content: ''; position: absolute; top: 0; right: 0; width: 120px; height: 120px; background: radial-gradient(circle at top right, rgba(199,168,135,0.04), transparent 70%); pointer-events: none; }
 .card::after  { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(to right,transparent,rgba(137,10,55,0.3),rgba(199,168,135,0.2),transparent); }
 
 /* ══ MEANING ══ */
-.meaning    { font-family: var(--f-display); font-size: 17px; line-height: 2.3; color: rgba(250,247,242,0.68); text-align: center; }
-.meaning-hl { color: #d9c4a4; display: block; font-size: 22px; margin-bottom: 4px; font-weight: 700; }
+.meaning    { font-family: var(--f-display); font-size: 22px; line-height: 2.3; color: rgba(255,255,255,0.9); text-align: center; }
+.meaning-hl { color: #d9c4a4; display: block; font-size: 28px; margin-bottom: 4px; font-weight: 700; }
 .meaning-sp { display: block; height: 14px; }
 
 /* ══ COUNTDOWN ══ */
 .cd-poem {
-  font-family: var(--f-display); font-size: 17px; line-height: 2.2;
-  color: rgba(250,247,242,0.52); text-align: center;
+  font-family: var(--f-display); font-size: 22px; line-height: 2.2;
+  color: rgba(255,255,255,0.88); text-align: center;
   margin-bottom: 32px;
 }
 .cd-poem em { color: #d9c4a4; font-style: normal; }
 
 .cd-wrap  { text-align: center; width: 100%; }
 .cd-intro {
-  font-family: var(--f-body); font-size: 10px; letter-spacing: 4px;
+  font-family: var(--f-body); font-size: 13px; letter-spacing: 4px;
   color: rgba(199,168,135,0.45); text-transform: uppercase;
   margin-bottom: 28px; font-weight: 600;
 }
@@ -356,7 +289,7 @@ body {
 
 .cd-n {
   font-family: var(--f-display);
-  font-size: clamp(44px, 11vw, 64px);
+  font-size: clamp(54px, 13vw, 80px);
   font-weight: 700; color: #faf7f2;
   display: block; line-height: 1;
   letter-spacing: -1px;
@@ -366,7 +299,7 @@ body {
   position: relative; z-index: 1;
 }
 .cd-l {
-  font-size: 9px; letter-spacing: 2.5px;
+  font-size: 12px; letter-spacing: 2.5px;
   color: rgba(199,168,135,0.4);
   font-family: var(--f-body); font-weight: 600;
   text-transform: uppercase;
@@ -377,36 +310,36 @@ body {
 .dt-card { background: rgba(35,0,6,0.97); border: 1px solid rgba(199,168,135,0.18); border-radius: 18px; padding: 34px 20px; text-align: center; position: relative; overflow: hidden; }
 .dt-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(to right,transparent,rgba(137,10,55,0.4),rgba(199,168,135,0.3),transparent); }
 .dt-card::after  { content: ''; position: absolute; top: 0; left: 50%; width: 60px; height: 100%; transform: translateX(-50%); background: linear-gradient(to bottom,transparent,rgba(199,168,135,0.04),transparent); pointer-events: none; }
-.dt-day  { font-family: var(--f-display); font-size: 24px; color: #d9c4a4; margin-bottom: 4px; }
-.dt-date { font-family: var(--f-display); font-size: 44px; font-weight: 700; color: #faf7f2; line-height: 1.1; text-shadow: 0 0 30px rgba(199,168,135,0.2); }
-.dt-year { font-size: 15px; color: #833943; margin-bottom: 24px; margin-top: 4px; font-family: var(--f-body); }
+.dt-day  { font-family: var(--f-display); font-size: 30px; color: #d9c4a4; margin-bottom: 4px; }
+.dt-date { font-family: var(--f-display); font-size: 56px; font-weight: 700; color: #faf7f2; line-height: 1.1; text-shadow: 0 0 30px rgba(199,168,135,0.2); }
+.dt-year { font-size: 18px; color: rgba(255,255,255,0.6); margin-bottom: 24px; margin-top: 4px; font-family: var(--f-body); }
 .dt-row  { display: flex; justify-content: center; border-top: 1px solid rgba(199,168,135,0.1); padding-top: 20px; }
 .dt-sep  { width: 1px; background-color: rgba(199,168,135,0.1); margin: 0 22px; }
 .dt-item { text-align: center; }
-.dt-val  { font-family: var(--f-display); font-size: 24px; color: #d9c4a4; display: block; }
-.dt-lbl  { font-size: 11px; color: #833943; margin-top: 4px; font-family: var(--f-body); }
+.dt-val  { font-family: var(--f-display); font-size: 30px; color: #d9c4a4; display: block; }
+.dt-lbl  { font-size: 14px; color: rgba(255,255,255,0.6); margin-top: 4px; font-family: var(--f-body); }
 
 /* ══ VENUE ══ */
 .venue-card { background: rgba(64,4,20,0.95); border: 1px solid rgba(199,168,135,0.14); border-radius: 18px; padding: 30px 20px; text-align: center; position: relative; overflow: hidden; }
 .venue-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(to right,transparent,rgba(137,10,55,0.3),rgba(199,168,135,0.2),transparent); }
 .venue-ico  { width: 46px; height: 46px; margin: 0 auto 14px; background-color: rgba(137,10,55,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(137,10,55,0.2); }
-.venue-nm   { font-family: var(--f-display); font-size: 22px; color: #d9c4a4; margin-bottom: 8px; font-weight: 700; }
-.venue-addr { font-size: 14.5px; color: #833943; line-height: 2; margin-bottom: 22px; font-family: var(--f-body); }
-.map-btn    { display: inline-flex; align-items: center; gap: 8px; background: transparent; border: 1px solid rgba(199,168,135,0.3); color: #d9c4a4; font-family: var(--f-body); font-size: 14px; padding: 11px 26px; border-radius: 50px; text-decoration: none; -webkit-tap-highlight-color: transparent; }
+.venue-nm   { font-family: var(--f-display); font-size: 28px; color: #d9c4a4; margin-bottom: 8px; font-weight: 700; }
+.venue-addr { font-size: 18px; color: rgba(255,255,255,0.72); line-height: 2; margin-bottom: 22px; font-family: var(--f-body); }
+.map-btn    { display: inline-flex; align-items: center; gap: 8px; background: transparent; border: 1px solid rgba(199,168,135,0.3); color: #d9c4a4; font-family: var(--f-body); font-size: 17px; padding: 11px 26px; border-radius: 50px; text-decoration: none; -webkit-tap-highlight-color: transparent; }
 .map-btn:active { background-color: rgba(199,168,135,0.08); }
 
 /* ══ MOMENT & MESSAGE ══ */
 .moment-sec { text-align: center; }
-.moment-q   { font-family: var(--f-display); font-size: 18px; line-height: 2.2; color: rgba(250,247,242,0.62); max-width: 310px; margin: 0 auto; }
+.moment-q   { font-family: var(--f-display); font-size: 22px; line-height: 2.2; color: rgba(255,255,255,0.88); max-width: 310px; margin: 0 auto; }
 .moment-q strong { color: #d9c4a4; font-weight: 400; }
 
 .msg-card        { background: rgba(64,4,20,0.95); border: 1px solid rgba(199,168,135,0.14); border-radius: 18px; padding: 30px 20px; position: relative; overflow: hidden; }
 .msg-card::before { content: '\201C'; font-family: var(--f-display); font-size: 110px; color: rgba(199,168,135,0.05); position: absolute; top: -6px; right: 6px; line-height: 1; pointer-events: none; }
 .msg-card::after  { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(to right,transparent,rgba(137,10,55,0.3),rgba(199,168,135,0.2),transparent); }
-.msg-from { font-family: var(--f-body); font-size: 10px; letter-spacing: 3px; color: #c7a887; opacity: 0.55; margin-bottom: 16px; }
-.msg-txt  { font-family: var(--f-display); font-size: 17px; line-height: 2.25; color: rgba(250,247,242,0.72); margin-bottom: 18px; }
+.msg-from { font-family: var(--f-body); font-size: 13px; letter-spacing: 3px; color: #c7a887; opacity: 0.55; margin-bottom: 16px; }
+.msg-txt  { font-family: var(--f-display); font-size: 22px; line-height: 2.25; color: rgba(255,255,255,0.9); margin-bottom: 18px; }
 .msg-txt em { color: #d9c4a4; font-style: normal; }
-.msg-sig  { font-size: 12px; color: #6b2438; text-align: left; font-family: var(--f-body); }
+.msg-sig  { font-size: 15px; color: rgba(255,255,255,0.5); text-align: left; font-family: var(--f-body); }
 
 /* ══ INSTRUCTIONS ══ */
 .instr-list { list-style: none; }
@@ -414,12 +347,69 @@ body {
 .instr-item:last-child { border-bottom: none; }
 .instr-ico  { width: 34px; height: 34px; flex-shrink: 0; background-color: rgba(137,10,55,0.08); border-radius: 8px; border: 1px solid rgba(137,10,55,0.15); display: flex; align-items: center; justify-content: center; margin-top: 2px; }
 .instr-ico svg { width: 16px; height: 16px; }
-.instr-p    { font-size: 15px; color: rgba(250,247,242,0.65); line-height: 1.8; font-family: var(--f-body); }
+.instr-p    { font-size: 19px; color: rgba(255,255,255,0.88); line-height: 1.8; font-family: var(--f-body); }
+
+/* ══ MESSAGES ══ */
+.msg-write-intro {
+  font-family: var(--f-display); font-size: 20px; line-height: 2.3;
+  color: rgba(255,255,255,0.88); text-align: center;
+  margin-bottom: 28px;
+}
+.msg-write-intro em { color: #d9c4a4; font-style: normal; }
+
+.msg-form {
+  width: 100%; display: flex; flex-direction: column; gap: 12px;
+}
+.msg-field {
+  width: 100%;
+  background: rgba(64,4,20,0.6);
+  border: 1px solid rgba(199,168,135,0.18);
+  border-radius: 12px;
+  padding: 14px 18px;
+  font-family: var(--f-display); font-size: 18px;
+  color: #faf7f2; text-align: right; direction: rtl;
+  outline: none; resize: none;
+  transition: border-color 0.2s;
+}
+.msg-field:focus { border-color: rgba(199,168,135,0.5); }
+.msg-field::placeholder { color: rgba(255,255,255,0.28); }
+.msg-textarea { min-height: 110px; line-height: 1.9; }
+
+.msg-send-row {
+  display: flex; align-items: center; gap: 12px;
+}
+.msg-send-btn {
+  flex: 1;
+  background: linear-gradient(135deg, rgba(199,168,135,0.12), rgba(137,10,55,0.14));
+  border: 1px solid rgba(199,168,135,0.35);
+  color: #d9c4a4; font-family: var(--f-display); font-size: 18px;
+  padding: 14px; border-radius: 12px; cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, transform 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.msg-send-btn:hover  { border-color: rgba(199,168,135,0.6); background: rgba(199,168,135,0.10); }
+.msg-send-btn:active { transform: scale(0.97); }
+.msg-send-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+.msg-status {
+  text-align: center; font-family: var(--f-display); font-size: 17px;
+  min-height: 24px; transition: opacity 0.3s;
+}
+.msg-status.ok  { color: #a8d5a2; }
+.msg-status.err { color: #e07070; }
+
+.msg-view-link {
+  display: inline-flex; align-items: center; gap: 8px;
+  color: rgba(199,168,135,0.55); font-family: var(--f-body); font-size: 14px;
+  text-decoration: none; margin-top: 6px;
+  transition: color 0.2s;
+}
+.msg-view-link:hover { color: var(--gold-l); }
 
 /* ══ HONOR CARD ══ */
 .honor-intro {
-  font-family: var(--f-display); font-size: 16px; line-height: 2.2;
-  color: rgba(250,247,242,0.52); text-align: center;
+  font-family: var(--f-display); font-size: 20px; line-height: 2.2;
+  color: rgba(255,255,255,0.88); text-align: center;
   margin-bottom: 28px;
 }
 .honor-intro em { color: #d9c4a4; font-style: normal; }
@@ -436,7 +426,7 @@ body {
   width: 100%; max-width: 460px;
   background: linear-gradient(135deg, rgba(199,168,135,0.10), rgba(137,10,55,0.12));
   border: 1px solid rgba(199,168,135,0.32);
-  color: #d9c4a4; font-family: var(--f-display); font-size: 17px;
+  color: #d9c4a4; font-family: var(--f-display); font-size: 20px;
   padding: 15px; border-radius: 14px; cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: border-color 0.25s, background 0.25s, transform 0.2s;
@@ -449,14 +439,14 @@ body {
 
 /* ══ ARCHIVE ══ */
 .archive-poem {
-  font-family: var(--f-display); font-size: 17px; line-height: 2.3;
-  color: rgba(250,247,242,0.52); text-align: center;
+  font-family: var(--f-display); font-size: 22px; line-height: 2.3;
+  color: rgba(255,255,255,0.88); text-align: center;
   margin-bottom: 24px;
 }
 .archive-poem em { color: #d9c4a4; font-style: normal; }
 .archive-body {
-  font-family: var(--f-display); font-size: 14px; line-height: 2.2;
-  color: rgba(250,247,242,0.38); text-align: center;
+  font-family: var(--f-display); font-size: 18px; line-height: 2.2;
+  color: rgba(255,255,255,0.75); text-align: center;
   max-width: 400px; margin: 0 auto 32px;
 }
 .archive-open-btn {
@@ -464,7 +454,7 @@ body {
   width: 100%; max-width: 340px;
   background: linear-gradient(135deg, rgba(199,168,135,0.08), rgba(137,10,55,0.10));
   border: 1px solid rgba(199,168,135,0.32);
-  color: #d9c4a4; font-family: var(--f-display); font-size: 17px;
+  color: #d9c4a4; font-family: var(--f-display); font-size: 20px;
   padding: 16px 24px; border-radius: 14px; cursor: pointer;
   text-decoration: none;
   transition: border-color 0.25s, background 0.25s, transform 0.15s;
@@ -476,7 +466,7 @@ body {
 
 /* ══ FROM UFUQ TO THE FUTURE ══ */
 .future-h {
-  font-family: var(--f-display); font-size: clamp(28px, 8vw, 44px);
+  font-family: var(--f-display); font-size: clamp(36px, 9vw, 56px);
   line-height: 1.45; text-align: center;
   color: var(--cream); margin-bottom: 28px;
 }
@@ -491,14 +481,14 @@ body {
 }
 
 .future-poem {
-  font-family: var(--f-display); font-size: clamp(15px, 4.2vw, 18px);
-  line-height: 2.4; color: rgba(250,247,242,0.58); text-align: center;
+  font-family: var(--f-display); font-size: clamp(19px, 5vw, 24px);
+  line-height: 2.4; color: rgba(255,255,255,0.88); text-align: center;
 }
 .future-poem em { color: #d9c4a4; font-style: normal; }
 .future-sp { display: block; height: 18px; }
 
 /* ══ PHOTO FRAME ══ */
-.frame-intro { font-size: 14px; color: #833943; line-height: 1.9; text-align: center; margin-bottom: 22px; max-width: 300px; margin-left: auto; margin-right: auto; font-family: var(--f-body); }
+.frame-intro { font-size: 18px; color: rgba(255,255,255,0.72); line-height: 1.9; text-align: center; margin-bottom: 22px; max-width: 300px; margin-left: auto; margin-right: auto; font-family: var(--f-body); }
 .frame-opts  { display: flex; gap: 10px; margin-bottom: 18px; }
 .frame-opt   { flex: 1; border-radius: 10px; border: 2px solid rgba(199,168,135,0.14); background: rgba(64,4,20,0.95); cursor: pointer; -webkit-tap-highlight-color: transparent; padding: 12px 4px 10px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 6px; }
 .frame-opt.active { border-color: #c7a887; }
@@ -510,8 +500,8 @@ body {
 .up-area input { display: none; }
 .up-ico   { width: 40px; margin: 0 auto 10px; opacity: 0.35; }
 .up-ico svg { width: 40px; height: 40px; }
-.up-txt   { font-size: 14px; color: #833943; font-family: var(--f-body); }
-.up-sub   { font-size: 11px; color: #6b2438; margin-top: 4px; font-family: var(--f-body); }
+.up-txt   { font-size: 18px; color: rgba(255,255,255,0.72); font-family: var(--f-body); }
+.up-sub   { font-size: 14px; color: rgba(255,255,255,0.5); margin-top: 4px; font-family: var(--f-body); }
 
 .txt-inp  { width: 100%; background: rgba(64,4,20,0.95); border: 1px solid rgba(199,168,135,0.15); border-radius: 10px; padding: 12px 16px; font-family: var(--f-display); font-size: 15px; color: #faf7f2; text-align: right; direction: rtl; outline: none; margin-bottom: 14px; }
 .txt-inp:focus { border-color: rgba(199,168,135,0.4); }
@@ -520,8 +510,8 @@ body {
 .cv-wrap  { width: 100%; border-radius: 14px; overflow: hidden; margin-bottom: 14px; background-color: #4c061f; }
 .cv-wrap canvas { width: 100%; height: auto; display: block; }
 .f-btns   { display: flex; gap: 10px; }
-.btn-gold { flex: 1; background: linear-gradient(135deg,#c7a887,#907055); color: #38040f; font-family: var(--f-display); font-size: 14px; font-weight: 700; padding: 13px; border-radius: 10px; border: none; cursor: pointer; -webkit-tap-highlight-color: transparent; box-shadow: 0 4px 20px rgba(199,168,135,0.2); }
-.btn-out  { flex: 1; background: transparent; color: #d9c4a4; font-family: var(--f-body); font-size: 14px; padding: 13px; border-radius: 10px; border: 1px solid rgba(199,168,135,0.25); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.btn-gold { flex: 1; background: linear-gradient(135deg,#c7a887,#907055); color: #38040f; font-family: var(--f-display); font-size: 17px; font-weight: 700; padding: 13px; border-radius: 10px; border: none; cursor: pointer; -webkit-tap-highlight-color: transparent; box-shadow: 0 4px 20px rgba(199,168,135,0.2); }
+.btn-out  { flex: 1; background: transparent; color: #d9c4a4; font-family: var(--f-body); font-size: 17px; padding: 13px; border-radius: 10px; border: 1px solid rgba(199,168,135,0.25); cursor: pointer; -webkit-tap-highlight-color: transparent; }
 
 /* ══ EVENT START OVERLAY ══ */
 #eventOverlay {
@@ -637,16 +627,19 @@ body {
 .footer { padding: 58px 24px 52px; text-align: center; position: relative; }
 .footer::before { content: ''; position: absolute; top: 0; left: 50%; width: 180px; height: 1px; transform: translateX(-50%); background: linear-gradient(to right,transparent,rgba(137,10,55,0.3),rgba(199,168,135,0.25),transparent); }
 .footer-orn   { width: 68px; margin: 0 auto 24px; opacity: 0.28; }
-.footer-q     { font-family: var(--f-display); font-size: 18px; line-height: 2; color: rgba(250,247,242,0.42); max-width: 360px; text-align: center; margin: 0 auto 16px; }
+.footer-q     { font-family: var(--f-display); font-size: 22px; line-height: 2; color: rgba(255,255,255,0.82); max-width: 360px; text-align: center; margin: 0 auto 16px; }
 .footer-q em  { color: #d9c4a4; font-style: normal; }
-.footer-sub   { font-size: 11px; color: rgba(199,168,135,0.35); letter-spacing: 1px; font-family: var(--f-body); margin-bottom: 6px; }
+.footer-sub   { font-size: 14px; color: rgba(199,168,135,0.35); letter-spacing: 1px; font-family: var(--f-body); margin-bottom: 6px; }
 .footer-brand { font-size: 10px; color: #6b2438; letter-spacing: 3px; font-family: var(--f-body); }
+.footer-credit { margin-top: 28px; font-size: 11px; color: rgba(199,168,135,0.2); font-family: var(--f-body); letter-spacing: 1.5px; }
+.footer-credit a { color: rgba(199,168,135,0.35); text-decoration: none; transition: color 0.25s; }
+.footer-credit a:hover { color: rgba(199,168,135,0.7); }
 
 /* ══ SCROLLBAR (page snap container + photo frame) ══ */
-.page::-webkit-scrollbar, .page > .sec-frame::-webkit-scrollbar { width: 3px; }
-.page::-webkit-scrollbar-track, .page > .sec-frame::-webkit-scrollbar-track { background: transparent; }
-.page::-webkit-scrollbar-thumb, .page > .sec-frame::-webkit-scrollbar-thumb { background: rgba(199,168,135,0.2); border-radius: 4px; }
-.page { scrollbar-width: thin; scrollbar-color: rgba(199,168,135,0.2) transparent; }
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(199,168,135,0.2); border-radius: 4px; }
+html { scrollbar-width: thin; scrollbar-color: rgba(199,168,135,0.2) transparent; }
 
 /* ══ RESPONSIVE ══ */
 @media (min-width: 768px) {
@@ -654,15 +647,15 @@ body {
   .page > section, .page > footer { padding: 48px max(40px, calc(50% - 340px)); }
   .page > .hero { padding: 72px max(40px, calc(50% - 340px)) 96px; }
   .page > .sec  { padding: 40px max(40px, calc(50% - 340px)); }
-  .hero-poem { max-width: 420px; font-size: 18px; }
+  .hero-poem { max-width: 420px; font-size: 22px; }
   .hero-title-img { width: min(420px, 72vw); }
-  .cd-n { font-size: 42px; }
+  .cd-n { font-size: 54px; }
   .cd-l { font-size: 14px; }
   .card, .dt-card, .venue-card, .msg-card { padding: 40px; }
-  .meaning { font-size: 20px; }
-  .dt-date { font-size: 56px; }
-  .dt-val  { font-size: 32px; }
-  .instr-p { font-size: 17px; }
+  .meaning { font-size: 24px; }
+  .dt-date { font-size: 70px; }
+  .dt-val  { font-size: 38px; }
+  .instr-p { font-size: 21px; }
   .frame-opts, .up-area, .txt-inp, .cv-wrap, .f-btns { max-width: 560px; margin-left: auto; margin-right: auto; }
 }
 @media (min-width: 1200px) {
@@ -673,22 +666,22 @@ body {
 }
 @media (max-width: 480px) {
   .page > .hero  { padding: 48px max(18px, calc(50% - 280px)) 70px; }
-  .hero-poem { font-size: clamp(13px, 3.8vw, 15.5px); max-width: 90vw; }
+  .hero-poem { font-size: clamp(16px, 4.5vw, 20px); max-width: 90vw; }
   .page > .sec   { padding: 28px max(16px, calc(50% - 280px)); }
   .card, .dt-card, .venue-card, .msg-card { padding: 22px 16px; }
-  .cd-n  { font-size: clamp(22px, 7vw, 30px); }
-  .dt-date { font-size: clamp(32px, 10vw, 44px); }
+  .cd-n  { font-size: clamp(28px, 8vw, 38px); }
+  .dt-date { font-size: clamp(38px, 11vw, 54px); }
   .dt-val  { font-size: clamp(18px, 5.5vw, 24px); }
   .msg-card::before { font-size: clamp(60px, 20vw, 110px); }
-  .meaning { font-size: clamp(14px, 4.2vw, 17px); }
-  .venue-nm   { font-size: clamp(18px, 5vw, 22px); }
+  .meaning { font-size: clamp(18px, 5vw, 22px); }
+  .venue-nm   { font-size: clamp(22px, 6vw, 28px); }
   .venue-addr { font-size: clamp(12px, 3.5vw, 14.5px); }
   .page > footer { padding: 44px max(18px, calc(50% - 280px)) 40px; }
-  .footer-q { font-size: clamp(14px, 4.2vw, 18px); max-width: 90vw; }
+  .footer-q { font-size: clamp(18px, 5vw, 22px); max-width: 90vw; }
 }
 @media (max-width: 380px) {
-  .cd-n    { font-size: 20px; }
-  .dt-date { font-size: 30px; }
+  .cd-n    { font-size: 26px; }
+  .dt-date { font-size: 38px; }
 }
 </style>
 </head>
@@ -699,10 +692,11 @@ body {
 
   <canvas id="starsBg" ref="starsBgRef"></canvas>
   <div id="sceneBg"></div>
+  <canvas id="ambientBg"></canvas>
 
   <!-- Music toggle (fixed bottom-right) -->
   <button class="music-btn" :class="{ playing: isMusicPlaying }" @click="toggleMusic"
-    :title="isMusicPlaying ? 'إيقاف الموسيقى' : 'تشغيل الموسيقى'">
+    :title="isMusicPlaying ? 'كتم الموسيقى' : 'تشغيل الموسيقى'">
     <!-- Playing: speaker with waves -->
     <svg v-if="isMusicPlaying" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
       <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
@@ -760,8 +754,8 @@ body {
       <div class="hero-tagline">أنت الآن على بُعد نبضة واحدة من الحلم.</div>
       <div class="hero-line"></div>
       <p class="hero-poem">
-        <em>قابَ حُلم | بيان الاستحقاق</em><br>
-قابَ حُلم: هي المَسافةُ الصفر. النقطةُ التي يتوقفُ عندها الزمانُ ليلتقيَ فيها مجهودُ (اثني عشر عاماً) بقطافِ العُمر. هو الوَصفُ الذي يليقُ بلحظةِ التتويج، حين يصبح الحلمُ قريبًا إلى حدّ اللمس، فيتلاشى معه كلّ ما عدا فرحةُ الإنجاز، وامتنانُ القلب، وصدقُ العزم على المضي قدمًا نحو آفاقٍ أرحب.
+        <em>قابَ حُلم </em><br>
+ هي المَسافةُ الصفر. النقطةُ التي يتوقفُ عندها الزمانُ ليلتقيَ فيها مجهودُ (اثني عشر عاماً) بقطافِ العُمر.
       </p>
       <div class="scroll-cue">
         <p>تمرير</p>
@@ -774,18 +768,6 @@ body {
 
     <!-- COUNTDOWN -->
     <section class="sec fs" data-anim="slide-up">
-      <div class="sp">
-        <div class="sp-r" style="width:220px;height:220px;top:50%;left:50%;--t:4s;--d:0s;"></div>
-        <div class="sp-r" style="width:220px;height:220px;top:50%;left:50%;--t:4s;--d:1.33s;"></div>
-        <div class="sp-r" style="width:220px;height:220px;top:50%;left:50%;--t:4s;--d:2.66s;"></div>
-        <div class="sp-o" style="width:320px;height:320px;top:50%;left:50%;transform:translate(-50%,-50%);--c:rgba(199,168,135,0.05);--t:6s;--d:0s;--x1:0px;--y1:0px;--x2:0px;--y2:0px;"></div>
-        <div class="sp-s" style="width:4px;height:4px;top:22%;left:9%;--t:2.8s;--d:0.3s;--a:0.8;"></div>
-        <div class="sp-s" style="width:3px;height:3px;top:20%;right:11%;--t:3.2s;--d:1s;--a:0.6;"></div>
-        <div class="sp-s" style="width:4px;height:4px;bottom:24%;left:14%;--t:2.5s;--d:0.7s;--a:0.7;--c:#890a37;"></div>
-        <div class="sp-s" style="width:3px;height:3px;bottom:22%;right:9%;--t:3.5s;--d:1.5s;--a:0.5;"></div>
-        <div class="sp-drift" style="width:3px;height:3px;bottom:10%;left:28%;--t:6s;--d:0.5s;--dx:10px;"></div>
-        <div class="sp-drift" style="width:2px;height:2px;bottom:8%;right:32%;--t:7s;--d:2s;--dx:-8px;--c:rgba(137,10,55,0.5);"></div>
-      </div>
       <div class="sec-lbl">العد التنازلي</div>
       <p class="cd-poem">
         ما تبقّى ليس وقتًا<br>
@@ -820,17 +802,6 @@ body {
 
     <!-- VENUE -->
     <section class="sec fs" data-anim="slide-up">
-      <div class="sp">
-        <div class="sp-r" style="width:90px;height:90px;top:40%;left:50%;--t:3s;--d:0s;--c:rgba(199,168,135,0.18);"></div>
-        <div class="sp-r" style="width:90px;height:90px;top:40%;left:50%;--t:3s;--d:1s;--c:rgba(199,168,135,0.14);"></div>
-        <div class="sp-r" style="width:90px;height:90px;top:40%;left:50%;--t:3s;--d:2s;--c:rgba(199,168,135,0.10);"></div>
-        <div class="sp-o" style="width:210px;height:210px;top:-30px;right:-55px;--c:rgba(137,10,55,0.11);--t:9s;--d:0s;--x1:-12px;--y1:18px;--x2:8px;--y2:12px;"></div>
-        <div class="sp-o" style="width:160px;height:160px;bottom:-20px;left:-40px;--t:8s;--d:2s;--x1:14px;--y1:-10px;--x2:-8px;--y2:-16px;"></div>
-        <div class="sp-s" style="width:3px;height:3px;top:12%;left:10%;--t:3s;--d:0.4s;--a:0.6;"></div>
-        <div class="sp-s" style="width:4px;height:4px;top:16%;right:8%;--t:3.5s;--d:1.2s;--a:0.7;--c:#890a37;"></div>
-        <div class="sp-drift" style="width:3px;height:3px;bottom:18%;left:28%;--t:6s;--d:1s;--dx:10px;"></div>
-        <div class="sp-drift" style="width:2px;height:2px;bottom:12%;right:33%;--t:5s;--d:2.5s;--dx:-8px;--c:rgba(137,10,55,0.5);"></div>
-      </div>
       <div class="sec-lbl">المكان</div>
       <h2 class="sec-h">نادي الصيد — القاعة الملكية</h2>
       <div class="venue-card">
@@ -854,16 +825,6 @@ body {
 
     <!-- INSTRUCTIONS -->
     <section class="sec sec-frame fs" data-anim="stagger">
-      <div class="sp">
-        <div class="sp-o" style="width:190px;height:190px;top:-22px;left:-42px;--c:rgba(137,10,55,0.08);--t:8s;--d:0s;--x1:10px;--y1:16px;--x2:-8px;--y2:10px;"></div>
-        <div class="sp-o" style="width:140px;height:140px;bottom:-12px;right:-32px;--t:9s;--d:1.5s;--x1:-12px;--y1:-14px;--x2:8px;--y2:-8px;"></div>
-        <div class="sp-r" style="width:60px;height:60px;top:12%;right:8%;--t:5s;--d:0s;--c:rgba(199,168,135,0.08);"></div>
-        <div class="sp-r" style="width:60px;height:60px;top:12%;right:8%;--t:5s;--d:1.67s;--c:rgba(199,168,135,0.06);"></div>
-        <div class="sp-s" style="width:3px;height:3px;top:10%;right:10%;--t:2.8s;--d:0.5s;--a:0.6;"></div>
-        <div class="sp-s" style="width:3px;height:3px;bottom:12%;left:7%;--t:3.2s;--d:1.5s;--a:0.5;--c:#890a37;"></div>
-        <div class="sp-drift" style="width:2px;height:2px;bottom:6%;left:48%;--t:6s;--d:0.5s;--dx:10px;--c:rgba(199,168,135,0.22);"></div>
-        <div class="sp-drift" style="width:2px;height:2px;bottom:10%;right:44%;--t:7s;--d:2s;--dx:-8px;--c:rgba(199,168,135,0.18);"></div>
-      </div>
       <div class="sec-lbl">بروتوكول الحفل</div>
       <h2 class="sec-h">بروتوكول الحفل</h2>
       <div class="card">
@@ -903,34 +864,38 @@ body {
             </div>
             <p class="instr-p">عدستك مرحب بها لتوثيق الفرح، شريطة أن تترك المساحة للآخرين ليعيشوا المشهد بوضوح.</p>
           </li>
-          <li class="instr-item">
-            <div class="instr-ico">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#c7a887" stroke-width="1.5" stroke-linecap="round">
-                <circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/>
-                <line x1="18" y1="14" x2="18" y2="20"/><line x1="15" y1="17" x2="21" y2="17"/>
-              </svg>
-            </div>
-            <p class="instr-p">فريق التنظيم بياقاتهم الرسمية متاحون دائماً لضمان راحتك وسلاسة ليلتك.</p>
-          </li>
         </ul>
+      </div>
+    </section>
+
+    <!-- MESSAGES -->
+    <section class="sec fs" data-anim="slide-up">
+      <div class="sec-lbl">رسائل الليلة</div>
+      <h2 class="sec-h">اكتب الآن كلمةً تبقى</h2>
+      <p class="msg-write-intro">
+        رسالة قصيرة — شعور صادق — دعاء — فخر — أو ذكرى<br>
+        <em>وقد تكون كلمتك جزءًا من ذاكرة هذه الليلة</em>
+      </p>
+      <div class="msg-form">
+        <input class="msg-field" v-model="msgFrom" placeholder="اسمك (اختياري)" maxlength="60">
+        <textarea class="msg-field msg-textarea" v-model="msgText" placeholder="اكتب رسالتك هنا…" maxlength="400"></textarea>
+        <div class="msg-send-row">
+          <button class="msg-send-btn" @click="submitMessage" :disabled="msgSending || !msgText.trim()">
+            {{ msgSending ? '…' : 'أرسل رسالتك ✦' }}
+          </button>
+        </div>
+        <div class="msg-status" :class="msgStatusType">{{ msgStatusText }}</div>
+        <div style="text-align:center">
+          <a class="msg-view-link" href="messages.html" target="_blank">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            شاهد رسائل الليلة
+          </a>
+        </div>
       </div>
     </section>
 
     <!-- HONOR CARD -->
     <section class="sec fs" data-anim="fade-scale">
-      <div class="sp">
-        <div class="sp-o" style="width:260px;height:260px;top:50%;left:50%;transform:translate(-50%,-50%);--c:rgba(199,168,135,0.06);--t:8s;--d:0s;--x1:0;--y1:0;--x2:0;--y2:0;"></div>
-        <div class="sp-r" style="width:100px;height:100px;top:50%;left:50%;--t:4s;--d:0s;--c:rgba(199,168,135,0.12);"></div>
-        <div class="sp-r" style="width:100px;height:100px;top:50%;left:50%;--t:4s;--d:1.33s;--c:rgba(199,168,135,0.09);"></div>
-        <div class="sp-r" style="width:100px;height:100px;top:50%;left:50%;--t:4s;--d:2.66s;--c:rgba(199,168,135,0.06);"></div>
-        <div class="sp-o" style="width:150px;height:150px;top:-20px;right:-30px;--c:rgba(137,10,55,0.10);--t:9s;--d:1s;--x1:-10px;--y1:14px;--x2:8px;--y2:8px;"></div>
-        <div class="sp-o" style="width:150px;height:150px;bottom:-20px;left:-30px;--t:8s;--d:0.5s;--x1:12px;--y1:-12px;--x2:-6px;--y2:-16px;"></div>
-        <div class="sp-s" style="width:4px;height:4px;top:14%;left:8%;--t:2.8s;--d:0.3s;--a:0.7;"></div>
-        <div class="sp-s" style="width:3px;height:3px;top:16%;right:6%;--t:3.2s;--d:1.1s;--a:0.55;--c:#890a37;"></div>
-        <div class="sp-s" style="width:4px;height:4px;bottom:14%;right:8%;--t:2.6s;--d:0.6s;--a:0.6;"></div>
-        <div class="sp-drift" style="width:3px;height:3px;bottom:10%;left:32%;--t:6.5s;--d:1s;--dx:12px;"></div>
-        <div class="sp-drift" style="width:2px;height:2px;bottom:8%;right:36%;--t:5.5s;--d:2.2s;--dx:-10px;--c:rgba(137,10,55,0.42);"></div>
-      </div>
       <div class="sec-lbl">بطاقة الشرف</div>
       <p class="honor-intro">
         لأن لكل ضيف <em>أثره الخاص</em><br>
@@ -950,19 +915,6 @@ body {
 
     <!-- ARCHIVE -->
     <section class="sec fs" data-anim="slide-up">
-      <div class="sp">
-        <div class="sp-o" style="width:220px;height:220px;top:-40px;left:-60px;--c:rgba(199,168,135,0.12);--t:9s;--d:0s;--x1:16px;--y1:20px;--x2:-10px;--y2:14px;"></div>
-        <div class="sp-o" style="width:160px;height:160px;bottom:-30px;right:-50px;--c:rgba(137,10,55,0.15);--t:10s;--d:2s;--x1:-12px;--y1:-18px;--x2:10px;--y2:-12px;"></div>
-        <div class="sp-o" style="width:100px;height:100px;top:38%;right:8%;--t:7s;--d:1s;--x1:-10px;--y1:12px;--x2:8px;--y2:-8px;"></div>
-        <div class="sp-r" style="width:120px;height:120px;top:22%;left:18%;--c:rgba(199,168,135,0.07);--t:5s;--d:0s;"></div>
-        <div class="sp-r" style="width:80px;height:80px;bottom:28%;right:22%;--c:rgba(137,10,55,0.10);--t:4s;--d:1.8s;"></div>
-        <div class="sp-drift" style="width:3px;height:3px;bottom:20%;left:22%;--t:7s;--d:0s;--dx:14px;"></div>
-        <div class="sp-drift" style="width:2px;height:2px;bottom:12%;left:55%;--t:5.5s;--d:2s;--dx:-8px;--c:rgba(199,168,135,0.28);"></div>
-        <div class="sp-drift" style="width:2px;height:2px;bottom:25%;right:20%;--t:8s;--d:1s;--dx:6px;--c:rgba(137,10,55,0.42);"></div>
-        <div class="sp-s" style="width:3px;height:3px;top:16%;left:10%;--t:3s;--d:0.5s;--a:0.55;"></div>
-        <div class="sp-s" style="width:2px;height:2px;top:20%;right:10%;--t:3.5s;--d:1.5s;--a:0.5;--c:#890a37;"></div>
-        <div class="sp-s" style="width:3px;height:3px;bottom:30%;left:40%;--t:4s;--d:2.5s;--a:0.45;"></div>
-      </div>
       <div class="sec-lbl">الأرشيف</div>
       <p class="archive-poem">
         فصلٌ مضى..<br>
@@ -982,20 +934,6 @@ body {
 
     <!-- FROM UFUQ TO THE FUTURE -->
     <section class="sec fs" data-anim="flip">
-      <div class="sp">
-        <div class="sp-o" style="width:240px;height:240px;top:-60px;right:-70px;--c:rgba(199,168,135,0.11);--t:10s;--d:0s;--x1:18px;--y1:22px;--x2:-12px;--y2:16px;"></div>
-        <div class="sp-o" style="width:180px;height:180px;bottom:-40px;left:-60px;--c:rgba(137,10,55,0.13);--t:11s;--d:2.5s;--x1:-14px;--y1:-20px;--x2:12px;--y2:-10px;"></div>
-        <div class="sp-o" style="width:110px;height:110px;top:36%;left:6%;--t:7.5s;--d:1s;--x1:-10px;--y1:14px;--x2:8px;--y2:-10px;"></div>
-        <div class="sp-r" style="width:160px;height:160px;top:15%;right:12%;--c:rgba(199,168,135,0.06);--t:6s;--d:0.5s;"></div>
-        <div class="sp-r" style="width:100px;height:100px;bottom:20%;left:20%;--c:rgba(137,10,55,0.09);--t:5s;--d:2s;"></div>
-        <div class="sp-drift" style="width:3px;height:3px;bottom:22%;left:24%;--t:7.5s;--d:0s;--dx:16px;"></div>
-        <div class="sp-drift" style="width:2px;height:2px;bottom:14%;left:58%;--t:6s;--d:2.2s;--dx:-10px;--c:rgba(199,168,135,0.28);"></div>
-        <div class="sp-drift" style="width:3px;height:3px;bottom:30%;right:18%;--t:8s;--d:1s;--dx:8px;--c:rgba(137,10,55,0.42);"></div>
-        <div class="sp-drift" style="width:2px;height:2px;bottom:10%;right:42%;--t:5.5s;--d:3s;--dx:-12px;"></div>
-        <div class="sp-s" style="width:3px;height:3px;top:12%;left:14%;--t:3.5s;--d:0.6s;--a:0.6;"></div>
-        <div class="sp-s" style="width:2px;height:2px;top:22%;right:8%;--t:4s;--d:1.4s;--a:0.5;--c:#890a37;"></div>
-        <div class="sp-s" style="width:3px;height:3px;bottom:28%;right:30%;--t:3s;--d:2.8s;--a:0.45;"></div>
-      </div>
       <div class="sec-lbl">الرؤية</div>
       <h2 class="sec-h future-h">من أُفُق<br><em>إلى المستقبل</em></h2>
       <div class="card future-card">
@@ -1009,208 +947,9 @@ body {
         </p>
       </div>
     </section>
-
-    <!-- DIV 1 -->
-    <div class="div-orn fs" data-anim="fade-scale">
-      <svg viewBox="0 0 280 14" fill="none">
-        <line x1="0" y1="7" x2="118" y2="7" stroke="url(#da1)" stroke-width="0.6"/>
-        <path d="M122 7 L130 1 L138 7 L130 13 Z" fill="none" stroke="#c7a887" stroke-width="0.9"/>
-        <line x1="142" y1="7" x2="280" y2="7" stroke="url(#db1)" stroke-width="0.6"/>
-        <defs>
-          <linearGradient id="da1" x1="0" y1="0" x2="118" y2="0" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#c7a887" stop-opacity="0"/>
-            <stop offset="100%" stop-color="#c7a887" stop-opacity="0.5"/>
-          </linearGradient>
-          <linearGradient id="db1" x1="142" y1="0" x2="280" y2="0" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#c7a887" stop-opacity="0.5"/>
-            <stop offset="100%" stop-color="#c7a887" stop-opacity="0"/>
-          </linearGradient>
-        </defs>
-      </svg>
-    </div>
-
-    <!-- MEANING -->
-    <section class="sec fs" data-anim="slide-left">
-      <div class="sp">
-        <div class="sp-o" style="width:200px;height:200px;top:-30px;right:-50px;--t:8s;--d:0s;--x1:-14px;--y1:18px;--x2:10px;--y2:12px;"></div>
-        <div class="sp-o" style="width:140px;height:140px;bottom:-10px;left:-35px;--c:rgba(137,10,55,0.16);--t:9s;--d:1.5s;--x1:12px;--y1:-14px;--x2:-8px;--y2:-20px;"></div>
-        <div class="sp-o" style="width:90px;height:90px;top:42%;left:8%;--t:6s;--d:3s;--x1:8px;--y1:-12px;--x2:-10px;--y2:-6px;"></div>
-        <div class="sp-drift" style="width:3px;height:3px;bottom:18%;left:18%;--t:7s;--d:0s;--dx:12px;"></div>
-        <div class="sp-drift" style="width:2px;height:2px;bottom:8%;left:52%;--t:5.5s;--d:2s;--dx:-8px;--c:rgba(199,168,135,0.28);"></div>
-        <div class="sp-drift" style="width:2px;height:2px;bottom:22%;right:22%;--t:8s;--d:1s;--dx:6px;--c:rgba(137,10,55,0.45);"></div>
-        <div class="sp-drift" style="width:3px;height:3px;bottom:10%;right:38%;--t:6s;--d:3.5s;--dx:-14px;"></div>
-        <div class="sp-s" style="width:3px;height:3px;top:14%;left:12%;--t:3s;--d:0.4s;--a:0.6;"></div>
-        <div class="sp-s" style="width:2px;height:2px;top:18%;right:8%;--t:3.5s;--d:1.2s;--a:0.5;--c:#890a37;"></div>
-      </div>
-      <div class="sec-lbl">المعنى</div>
-      <h2 class="sec-h">ما هي قاب حلم؟</h2>
-      <div class="card">
-        <p class="meaning">
-          <span class="meaning-hl">قاب حلم</span>
-          ليست مجرد اسم دفعة<br>
-          بل وصفٌ لتلك اللحظة الفارقة<br>
-          حين يصبح الحلم قريبًا إلى حدّ اللمس
-          <span class="meaning-sp"></span>
-          هي المسافة الأخيرة بين التعب والإنجاز<br>
-          هي الوقفة التي تسبق النداء على المنصة<br>
-          هي عمرٌ كاملٌ من السعي<br>
-          اختصر نفسه في ليلة
-        </p>
-      </div>
-    </section>
-
-    <!-- DIV 2 -->
-    <div class="div-orn fs" data-anim="fade-scale">
-      <svg viewBox="0 0 280 14" fill="none">
-        <line x1="0" y1="7" x2="118" y2="7" stroke="url(#da2)" stroke-width="0.6"/>
-        <path d="M122 7 L130 1 L138 7 L130 13 Z" fill="none" stroke="#c7a887" stroke-width="0.9"/>
-        <line x1="142" y1="7" x2="280" y2="7" stroke="url(#db2)" stroke-width="0.6"/>
-        <defs>
-          <linearGradient id="da2" x1="0" y1="0" x2="118" y2="0" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#c7a887" stop-opacity="0"/>
-            <stop offset="100%" stop-color="#c7a887" stop-opacity="0.5"/>
-          </linearGradient>
-          <linearGradient id="db2" x1="142" y1="0" x2="280" y2="0" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#c7a887" stop-opacity="0.5"/>
-            <stop offset="100%" stop-color="#c7a887" stop-opacity="0"/>
-          </linearGradient>
-        </defs>
-      </svg>
-    </div>
-
-    <!-- DATE -->
-    <section class="sec fs" data-anim="flip">
-      <div class="sp">
-        <div class="sp-o" style="width:240px;height:240px;top:18%;left:50%;transform:translateX(-50%);--c:rgba(199,168,135,0.07);--t:7s;--d:0s;--x1:0px;--y1:12px;--x2:0px;--y2:-6px;"></div>
-        <div class="sp-o" style="width:110px;height:110px;top:-15px;left:-25px;--c:rgba(137,10,55,0.12);--t:8s;--d:1.5s;--x1:10px;--y1:16px;--x2:-6px;--y2:10px;"></div>
-        <div class="sp-o" style="width:110px;height:110px;bottom:-15px;right:-25px;--t:9s;--d:0.5s;--x1:-12px;--y1:-14px;--x2:8px;--y2:-8px;"></div>
-        <div class="sp-s" style="width:5px;height:5px;top:14%;left:10%;--t:2.5s;--d:0s;--a:0.9;"></div>
-        <div class="sp-s" style="width:4px;height:4px;top:18%;right:8%;--t:3s;--d:0.8s;--a:0.7;"></div>
-        <div class="sp-s" style="width:3px;height:3px;top:32%;left:5%;--t:3.5s;--d:1.2s;--a:0.5;--c:#890a37;"></div>
-        <div class="sp-s" style="width:5px;height:5px;top:35%;right:6%;--t:2.8s;--d:0.5s;--a:0.8;"></div>
-        <div class="sp-s" style="width:3px;height:3px;bottom:20%;left:16%;--t:3.2s;--d:1.5s;--a:0.6;"></div>
-        <div class="sp-s" style="width:4px;height:4px;bottom:22%;right:12%;--t:2.6s;--d:0.3s;--a:0.7;--c:#890a37;"></div>
-        <div class="sp-drift" style="width:3px;height:3px;bottom:14%;left:40%;--t:6.5s;--d:1s;--dx:10px;"></div>
-        <div class="sp-drift" style="width:2px;height:2px;bottom:8%;right:42%;--t:5.5s;--d:2.5s;--dx:-8px;--c:rgba(137,10,55,0.45);"></div>
-      </div>
-      <div class="sec-lbl">موعد الاحتفال</div>
-      <div class="dt-card">
-        <div class="dt-day">{{ cfg.eventDayAr }}</div>
-        <div class="dt-date">{{ cfg.eventDateAr }}</div>
-        <div class="dt-year">{{ cfg.eventYearAr }}</div>
-        <div class="dt-row">
-          <div class="dt-item"><span class="dt-val">{{ cfg.eventStartTime }}</span><div class="dt-lbl">بدء الحفل</div></div>
-          <div class="dt-sep"></div>
-          <div class="dt-item"><span class="dt-val">{{ cfg.doorsOpenTime }}</span><div class="dt-lbl">فتح الأبواب</div></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- DOTS -->
-    <div class="div-dots fs" data-anim="fade-scale">
-      <svg viewBox="0 0 88 10" fill="none">
-        <circle cx="44" cy="5" r="1.8" fill="#c7a887" opacity="0.55"/>
-        <circle cx="34" cy="5" r="1.1" fill="#890a37" opacity="0.5"/>
-        <circle cx="54" cy="5" r="1.1" fill="#890a37" opacity="0.5"/>
-      </svg>
-    </div>
-
-    <!-- MOMENT -->
-    <section class="sec fs moment-sec" data-anim="fade-scale">
-      <div class="sp">
-        <div class="sp-o" style="width:280px;height:280px;top:50%;left:50%;transform:translate(-50%,-50%);--c:rgba(199,168,135,0.06);--t:9s;--d:0s;--x1:5px;--y1:-8px;--x2:-5px;--y2:-4px;"></div>
-        <div class="sp-o" style="width:170px;height:170px;top:8%;right:-25px;--c:rgba(137,10,55,0.09);--t:10s;--d:1s;--x1:-14px;--y1:16px;--x2:8px;--y2:12px;"></div>
-        <div class="sp-o" style="width:130px;height:130px;bottom:6%;left:-22px;--t:8s;--d:3s;--x1:10px;--y1:-12px;--x2:-6px;--y2:-18px;"></div>
-        <div class="sp-drift" style="width:4px;height:4px;bottom:12%;left:14%;--t:7s;--d:0s;--dx:18px;"></div>
-        <div class="sp-drift" style="width:3px;height:3px;bottom:6%;left:38%;--t:6s;--d:1.5s;--dx:-12px;--c:rgba(199,168,135,0.22);"></div>
-        <div class="sp-drift" style="width:2px;height:2px;bottom:16%;right:18%;--t:8s;--d:0.8s;--dx:8px;--c:rgba(137,10,55,0.45);"></div>
-        <div class="sp-drift" style="width:3px;height:3px;bottom:8%;right:44%;--t:5.5s;--d:3s;--dx:-16px;"></div>
-        <div class="sp-s" style="width:4px;height:4px;top:14%;left:7%;--t:3s;--d:0.2s;--a:0.7;"></div>
-        <div class="sp-s" style="width:3px;height:3px;top:20%;right:6%;--t:3.6s;--d:1s;--a:0.5;--c:#890a37;"></div>
-        <div class="sp-s" style="width:3px;height:3px;bottom:18%;left:6%;--t:2.8s;--d:1.8s;--a:0.6;"></div>
-        <div class="sp-s" style="width:4px;height:4px;bottom:14%;right:7%;--t:3.2s;--d:0.6s;--a:0.6;--c:#890a37;"></div>
-      </div>
-      <div class="sec-lbl">هذه الليلة</div>
-      <h2 class="sec-h">لحظة قاب حلم</h2>
-      <p class="moment-q">
-        في هذه الأمسية<br>
-        <strong>ستلتقي الذكريات بالمنصة</strong><br>
-        ويصعد الخريجون حاملين أعوامهم<br>
-        في خطوة واحدة<br><br>
-        لتكون الليلة احتفالًا بالإنجاز<br>
-        وبالبدايات التي تولد<br>
-        <strong>من نهايات جميلة</strong>
-      </p>
-    </section>
-
-    <!-- DIV 3 -->
-    <div class="div-orn fs" data-anim="fade-scale">
-      <svg viewBox="0 0 280 14" fill="none">
-        <line x1="0" y1="7" x2="118" y2="7" stroke="url(#da3)" stroke-width="0.6"/>
-        <path d="M122 7 L130 1 L138 7 L130 13 Z" fill="none" stroke="#c7a887" stroke-width="0.9"/>
-        <line x1="142" y1="7" x2="280" y2="7" stroke="url(#db3)" stroke-width="0.6"/>
-        <defs>
-          <linearGradient id="da3" x1="0" y1="0" x2="118" y2="0" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#c7a887" stop-opacity="0"/>
-            <stop offset="100%" stop-color="#c7a887" stop-opacity="0.5"/>
-          </linearGradient>
-          <linearGradient id="db3" x1="142" y1="0" x2="280" y2="0" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#c7a887" stop-opacity="0.5"/>
-            <stop offset="100%" stop-color="#c7a887" stop-opacity="0"/>
-          </linearGradient>
-        </defs>
-      </svg>
-    </div>
-
-    <!-- GRADUATE MESSAGE -->
-    <section class="sec fs" data-anim="slide-right">
-      <div class="sp">
-        <div class="sp-o" style="width:210px;height:210px;top:-25px;right:-35px;--c:rgba(199,168,135,0.09);--t:9s;--d:0.5s;--x1:-16px;--y1:14px;--x2:8px;--y2:20px;"></div>
-        <div class="sp-o" style="width:150px;height:150px;bottom:-15px;left:-35px;--c:rgba(137,10,55,0.10);--t:7s;--d:2s;--x1:12px;--y1:-10px;--x2:-8px;--y2:-16px;"></div>
-        <div class="sp-o" style="width:80px;height:80px;top:45%;right:4%;--c:rgba(199,168,135,0.07);--t:6s;--d:1s;--x1:-6px;--y1:-14px;--x2:8px;--y2:-8px;"></div>
-        <div class="sp-s" style="width:4px;height:4px;top:12%;left:7%;--t:3s;--d:0s;--a:0.65;"></div>
-        <div class="sp-s" style="width:3px;height:3px;top:18%;right:5%;--t:3.5s;--d:1.2s;--a:0.5;--c:#890a37;"></div>
-        <div class="sp-s" style="width:3px;height:3px;bottom:16%;left:6%;--t:2.8s;--d:0.8s;--a:0.55;"></div>
-        <div class="sp-drift" style="width:3px;height:3px;bottom:14%;left:24%;--t:6.5s;--d:1s;--dx:14px;"></div>
-        <div class="sp-drift" style="width:2px;height:2px;bottom:20%;right:28%;--t:7s;--d:2.5s;--dx:-10px;--c:rgba(137,10,55,0.42);"></div>
-        <div class="sp-drift" style="width:3px;height:3px;bottom:8%;left:55%;--t:5.5s;--d:0.5s;--dx:-12px;"></div>
-      </div>
-      <div class="sec-lbl">كلمة خريج</div>
-      <div class="msg-card">
-        <div class="msg-from">من أحد الخريجين إليكم</div>
-        <p class="msg-txt">
-          ربما ترون الليلة منصةً ورداءً<br>
-          وصورًا وابتسامات<br><br>
-          لكننا نراها <em>سنواتٍ كاملة</em> من المحاولة<br>
-          نراها تعبًا صامتًا<br>
-          ودعواتٍ كثيرة<br>
-          وقلوبًا تعلّقت بالأمل<br><br>
-          وجودكم معنا الليلة<br>
-          يجعل الفرح أوسع<br>
-          ويجعل الحلم <em>أجمل</em> حين يُرى<br>
-          بعيون من نحبّ
-        </p>
-        <div class="msg-sig">— دفعة قاب حلم · UFUQ 2026</div>
-      </div>
-    </section>
-
+    
     <!-- FOOTER -->
     <footer class="footer fs" data-anim="fade-scale">
-      <div class="sp">
-        <div class="sp-o" style="width:320px;height:320px;top:50%;left:50%;transform:translate(-50%,-50%);--c:rgba(199,168,135,0.05);--t:9s;--d:0s;--x1:0;--y1:0;--x2:0;--y2:0;"></div>
-        <div class="sp-r" style="width:130px;height:130px;top:50%;left:50%;--t:5.5s;--d:0s;--c:rgba(199,168,135,0.09);"></div>
-        <div class="sp-r" style="width:130px;height:130px;top:50%;left:50%;--t:5.5s;--d:1.83s;--c:rgba(199,168,135,0.07);"></div>
-        <div class="sp-r" style="width:130px;height:130px;top:50%;left:50%;--t:5.5s;--d:3.66s;--c:rgba(199,168,135,0.05);"></div>
-        <div class="sp-o" style="width:140px;height:140px;top:-20px;left:-30px;--c:rgba(137,10,55,0.10);--t:8s;--d:1s;--x1:10px;--y1:14px;--x2:-6px;--y2:8px;"></div>
-        <div class="sp-o" style="width:140px;height:140px;bottom:-20px;right:-30px;--c:rgba(137,10,55,0.10);--t:9s;--d:0s;--x1:-10px;--y1:-12px;--x2:8px;--y2:-8px;"></div>
-        <div class="sp-s" style="width:5px;height:5px;top:16%;left:12%;--t:3s;--d:0s;--a:0.75;"></div>
-        <div class="sp-s" style="width:4px;height:4px;top:14%;right:15%;--t:2.8s;--d:0.8s;--a:0.65;--c:#890a37;"></div>
-        <div class="sp-s" style="width:5px;height:5px;bottom:16%;left:18%;--t:3.5s;--d:1.2s;--a:0.7;"></div>
-        <div class="sp-s" style="width:4px;height:4px;bottom:14%;right:12%;--t:2.5s;--d:0.5s;--a:0.6;"></div>
-        <div class="sp-drift" style="width:3px;height:3px;bottom:14%;left:34%;--t:6s;--d:1s;--dx:12px;"></div>
-        <div class="sp-drift" style="width:3px;height:3px;bottom:8%;right:38%;--t:7s;--d:2s;--dx:-10px;--c:rgba(137,10,55,0.42);"></div>
-        <div class="sp-drift" style="width:2px;height:2px;bottom:10%;left:55%;--t:5.5s;--d:0.5s;--dx:8px;--c:rgba(199,168,135,0.25);"></div>
-      </div>
       <div class="footer-orn">
         <svg viewBox="0 0 70 36" fill="none">
           <path d="M35 4 L45 13 L55 4 L65 13" stroke="#c7a887" stroke-width="0.9" stroke-linecap="round"/>
@@ -1228,6 +967,7 @@ body {
       </blockquote>
       <div class="footer-sub">مجموعة مدارس أُفُق · حيثُ لا سماءَ للطموح.. بل آفاقٌ تُصنع</div>
       <div class="footer-brand">UFUQ · قاب حلم · 2026</div>
+      <div class="footer-credit">crafted with care by <a href="https://niubabel.com" target="_blank" rel="noopener">Niubabel</a></div>
     </footer>
 
   </div><!-- /page -->
@@ -1378,6 +1118,38 @@ createApp({
       }, 3800);
     };
 
+    // ─── MESSAGES ───
+    const msgFrom       = ref('');
+    const msgText       = ref('');
+    const msgSending    = ref(false);
+    const msgStatusText = ref('');
+    const msgStatusType = ref('');
+
+    const submitMessage = async () => {
+      if (!msgText.value.trim()) return;
+      msgSending.value    = true;
+      msgStatusText.value = '';
+      msgStatusType.value = '';
+      try {
+        const key = Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+        await _db.ref('messages/' + key).set({
+          from:  msgFrom.value.trim() || 'ضيف مجهول',
+          text:  msgText.value.trim(),
+          sentAt: Date.now()
+        });
+        msgText.value       = '';
+        msgFrom.value       = '';
+        msgStatusText.value = 'وصلت رسالتك ✦ شكراً لك';
+        msgStatusType.value = 'ok';
+      } catch {
+        msgStatusText.value = 'لم تُرسل، حاول مرة أخرى';
+        msgStatusType.value = 'err';
+      } finally {
+        msgSending.value = false;
+        setTimeout(() => { msgStatusText.value = ''; }, 4000);
+      }
+    };
+
     // ─── PHOTO FRAME ───
     const activeFrame    = ref(0);
     const isImageUploaded = ref(false);
@@ -1390,16 +1162,18 @@ createApp({
     const starsBgRef     = ref(null);
     const heroPtclRef    = ref(null);
     const audioRef       = ref(null);
-    const isMusicPlaying = ref(false);
+    const isMusicPlaying = ref(true);   // default: on
+    const musicMuted     = ref(false);  // separate mute flag
 
     const toggleMusic = () => {
       const audio = audioRef.value;
       if (!audio) return;
-      if (audio.paused) {
-        audio.play().then(() => { isMusicPlaying.value = true; }).catch(() => {});
-      } else {
+      if (!audio.paused) {
         audio.pause();
         isMusicPlaying.value = false;
+        musicMuted.value = true;
+      } else {
+        audio.play().then(() => { isMusicPlaying.value = true; musicMuted.value = false; }).catch(() => {});
       }
     };
 
@@ -1695,6 +1469,119 @@ createApp({
       window.addEventListener('resize', resize);
     };
 
+    // ─── AMBIENT CANVAS (unified page-wide layer) ───
+    const initAmbient = () => {
+      const cv = document.getElementById('ambientBg');
+      if (!cv) return;
+      const ctx = cv.getContext('2d');
+      let W, H, last = 0;
+
+      // Orbs — large soft glowing blobs that breathe slowly
+      const orbs = [];
+      // Drifters — tiny particles that rise and fade
+      const drifters = [];
+      // Sparks — twinkling points
+      const sparks = [];
+
+      const seed = () => {
+        W = cv.width  = window.innerWidth;
+        H = cv.height = window.innerHeight;
+
+        orbs.length = 0;
+        for (let i = 0; i < 6; i++) {
+          orbs.push({
+            x: Math.random() * W, y: Math.random() * H,
+            r: 180 + Math.random() * 220,
+            vx: (Math.random() - 0.5) * 0.18,
+            vy: (Math.random() - 0.5) * 0.10,
+            ph: Math.random() * Math.PI * 2,
+            spd: 0.003 + Math.random() * 0.004,
+            gold: Math.random() > 0.35
+          });
+        }
+
+        drifters.length = 0;
+        for (let i = 0; i < 28; i++) {
+          drifters.push(mkDrift(true));
+        }
+
+        sparks.length = 0;
+        for (let i = 0; i < 22; i++) {
+          sparks.push({
+            x: Math.random() * W, y: Math.random() * H,
+            r: 0.6 + Math.random() * 1.4,
+            ph: Math.random() * Math.PI * 2,
+            spd: 0.008 + Math.random() * 0.016,
+            gold: Math.random() > 0.3
+          });
+        }
+      };
+
+      const mkDrift = (scatter = false) => ({
+        x: Math.random() * W,
+        y: scatter ? Math.random() * H : H + 4,
+        r: 0.8 + Math.random() * 1.8,
+        vy: -(0.18 + Math.random() * 0.32),
+        vx: (Math.random() - 0.5) * 0.18,
+        life: scatter ? Math.random() : 0,
+        gold: Math.random() > 0.4
+      });
+
+      const draw = (now) => {
+        requestAnimationFrame(draw);
+        if (now - last < 33) return; last = now;
+        ctx.clearRect(0, 0, W, H);
+
+        // Orbs
+        for (const o of orbs) {
+          o.ph += o.spd;
+          o.x  += o.vx; o.y += o.vy;
+          if (o.x < -o.r) o.x = W + o.r;
+          if (o.x > W + o.r) o.x = -o.r;
+          if (o.y < -o.r) o.y = H + o.r;
+          if (o.y > H + o.r) o.y = -o.r;
+          const pulse = 0.5 + 0.5 * Math.sin(o.ph);
+          const a = o.gold ? 0.055 + 0.03 * pulse : 0.04 + 0.02 * pulse;
+          const g = ctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, o.r);
+          const col = o.gold ? `rgba(199,168,135,${a})` : `rgba(137,10,55,${a})`;
+          g.addColorStop(0, col);
+          g.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.fillStyle = g;
+          ctx.beginPath(); ctx.arc(o.x, o.y, o.r, 0, Math.PI * 2); ctx.fill();
+        }
+
+        // Drifters
+        for (let i = 0; i < drifters.length; i++) {
+          const d = drifters[i];
+          d.life += 0.004;
+          d.x += d.vx; d.y += d.vy;
+          const progress = d.life;
+          if (progress >= 1) { drifters[i] = mkDrift(); continue; }
+          const a = progress < 0.1 ? progress / 0.1
+                  : progress > 0.85 ? (1 - progress) / 0.15
+                  : 1;
+          ctx.globalAlpha = (d.gold ? 0.55 : 0.38) * a;
+          ctx.fillStyle   = d.gold ? '#c7a887' : 'rgba(137,10,55,0.8)';
+          ctx.beginPath(); ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2); ctx.fill();
+        }
+
+        // Sparks
+        for (const s of sparks) {
+          s.ph += s.spd;
+          const a = 0.5 + 0.5 * Math.sin(s.ph);
+          ctx.globalAlpha = (s.gold ? 0.55 : 0.40) * a;
+          ctx.fillStyle   = s.gold ? '#d9c4a4' : '#890a37';
+          ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill();
+        }
+
+        ctx.globalAlpha = 1;
+      };
+
+      seed();
+      requestAnimationFrame(draw);
+      window.addEventListener('resize', seed);
+    };
+
     // ─── HERO PARTICLES ───
     let heroAnimReq;
     const initHeroParticles = () => {
@@ -1760,38 +1647,49 @@ createApp({
       timerInterval = setInterval(updateCountdown, 1000);
 
       initStars();
+      initAmbient();
       initHeroParticles();
 
-      // Background music — try autoplay, fall back silently
+      // Background music — try autoplay immediately, then on first interaction as fallback
       const audio = audioRef.value;
       if (audio) {
         audio.volume = 0.35;
+        const startMusic = () => {
+          if (musicMuted.value) return;          // user already muted before interaction
+          audio.play()
+            .then(() => { isMusicPlaying.value = true; })
+            .catch(() => {});
+          document.removeEventListener('click',      startMusic);
+          document.removeEventListener('touchstart', startMusic);
+          document.removeEventListener('keydown',    startMusic);
+        };
+        // Try right away (works on desktop without strict policy)
         audio.play()
           .then(() => { isMusicPlaying.value = true; })
-          .catch(() => { isMusicPlaying.value = false; }); // autoplay blocked by browser — user can click the button
+          .catch(() => {
+            // Blocked — wait for first user gesture
+            document.addEventListener('click',      startMusic, { once: true });
+            document.addEventListener('touchstart', startMusic, { once: true });
+            document.addEventListener('keydown',    startMusic, { once: true });
+          });
       }
 
       // Scroll reveal — re-trigger animation every time a section enters view
       const els = document.querySelectorAll('.fs[data-anim]');
       els.forEach(el => el.classList.add('off'));
       if ('IntersectionObserver' in window) {
-        const pageEl = document.querySelector('.page');
         const ob = new IntersectionObserver(entries => {
           entries.forEach(en => {
             if (en.isIntersecting) {
-              // Reset then play: double-rAF ensures the off state paints first
               en.target.classList.remove('on');
               en.target.classList.add('off');
               requestAnimationFrame(() => requestAnimationFrame(() => {
                 en.target.classList.remove('off');
                 en.target.classList.add('on');
               }));
-            } else {
-              en.target.classList.remove('on');
-              en.target.classList.add('off');
             }
           });
-        }, { root: pageEl, threshold: 0.45 });
+        }, { root: null, threshold: 0.18, rootMargin: '0px 0px -60px 0px' });
         els.forEach(el => ob.observe(el));
       } else {
         els.forEach(el => { el.classList.remove('off'); el.classList.add('on'); });
@@ -1807,8 +1705,9 @@ createApp({
 
     return {
       guestName, guestRole, greeting, cfg, cd,
-      starsBgRef, heroPtclRef, audioRef, isMusicPlaying, toggleMusic,
-      honorCvRef, honorGenerated, generateHonorCard, drawHonorCard, downloadHonorCard
+      starsBgRef, heroPtclRef, audioRef, isMusicPlaying, musicMuted, toggleMusic,
+      honorCvRef, honorGenerated, generateHonorCard, drawHonorCard, downloadHonorCard,
+      msgFrom, msgText, msgSending, msgStatusText, msgStatusType, submitMessage
     };
   }
 }).mount('#app');
