@@ -1019,7 +1019,7 @@ createApp({
     const greeting = computed(() =>
       guestRole.value === 'parent'
         ? `أهلاً بكم، ${guestName.value}`
-        : `أهلاً بك أيها الخريج، ${guestName.value}`
+        : `أهلاً بك أيها الطالب، ${guestName.value}`
     );
 
     // ─── CONFIG (defaults overwritten by Firebase) ───
@@ -1373,7 +1373,7 @@ createApp({
       ctx.shadowBlur = 0;
 
       // ── Role tag ──
-      const roleTag = guestRole.value === 'parent' ? '— ولي أمر كريم —' : '— خريج متميز —';
+      const roleTag = guestRole.value === 'parent' ? '— ولي أمر كريم —' : '— طالب متميز —';
       ctx.fillStyle = 'rgba(199,168,135,0.58)';
       ctx.font = `400 ${W*0.026}px "Amiri","Geeza Pro",Georgia,serif`;
       ctx.fillText(roleTag, W/2, H/2 + 58);
