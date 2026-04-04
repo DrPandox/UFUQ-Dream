@@ -1325,10 +1325,11 @@ createApp({
 
         ctx.textAlign = 'center';
         const name = guestName.value || 'ضيفنا الكريم';
+        const F = '"theyearofthecamel","Amiri","Geeza Pro","Traditional Arabic",Georgia,serif';
 
         // Helper: draw line with optional text shadow
         const draw = (txt, size, color, shadowAlpha) => {
-          ctx.font = `${size}px "Amiri","Geeza Pro","Traditional Arabic",Georgia,serif`;
+          ctx.font = `${size}px ${F}`;
           ctx.fillStyle = color;
           ctx.shadowColor = `rgba(0,0,0,${shadowAlpha || 0})`;
           ctx.shadowBlur  = shadowAlpha ? 10 : 0;
@@ -1336,43 +1337,42 @@ createApp({
           ctx.shadowBlur = 0;
         };
 
-        // ── Position text block in the vertical center of the card ──
-        const lineSmall  = H * 0.055;
-        const lineName   = H * 0.095;
-        const lineGap    = H * 0.030;
-        const totalLines = lineSmall * 2 + lineName + lineSmall * 2 + lineGap + lineSmall;
-        let   currentY   = (H - totalLines) / 2 + lineSmall;
+        // ── Start text from vertical center of card, lines tight ──
+        const lineSmall = H * 0.060;   // regular line step
+        const lineName  = H * 0.085;   // name line step (larger font)
+        const lineGap   = H * 0.018;   // small gap before closing line
+        let   currentY  = H / 2;       // start exactly at center
 
         // Line 1 — invitation opener
-        draw('تتشرف مجموعة مدارس أفق بدعوة', W * 0.033, 'rgba(199,168,135,0.95)', 0.7);
+        draw('تتشرف مجموعة مدارس أفق بدعوة', W * 0.042, 'rgba(199,168,135,0.95)', 0.7);
         currentY += lineSmall;
 
         // Line 2 — honorific
-        draw('السيد', W * 0.033, 'rgba(255,255,255,0.80)', 0.5);
-        currentY += lineSmall * 1.15;
+        draw('السيد', W * 0.042, 'rgba(255,255,255,0.85)', 0.5);
+        currentY += lineSmall;
 
         // Line 3 — guest name (large, gold, glowing)
-        ctx.font        = `700 ${W * 0.075}px "Amiri","Geeza Pro","Traditional Arabic",Georgia,serif`;
+        ctx.font        = `700 ${W * 0.088}px ${F}`;
         ctx.fillStyle   = '#edd1a4';
-        ctx.shadowColor = 'rgba(199,168,135,0.55)';
+        ctx.shadowColor = 'rgba(199,168,135,0.6)';
         ctx.shadowBlur  = 28;
         ctx.fillText(name, W / 2, currentY);
         ctx.shadowBlur  = 0;
         currentY += lineName;
 
         // Line 4 — body
-        draw('للحضور الكريم في حفل تخرج', W * 0.033, 'rgba(255,255,255,0.85)', 0.6);
+        draw('للحضور الكريم في حفل تخرج', W * 0.042, 'rgba(255,255,255,0.88)', 0.6);
         currentY += lineSmall;
 
         // Line 5 — event title
-        draw('قابَ حُلم 2026', W * 0.038, '#edd1a4', 0.6);
+        draw('قابَ حُلم 2026', W * 0.048, '#edd1a4', 0.6);
         currentY += lineSmall + lineGap;
 
-        // Line 6 — closing line (smaller, subtle)
+        // Line 6 — closing line
         draw(
           'لنشهد معًا ليلةً من الفرح والاعتزاز تتجلّى فيها الأحلام في أجمل صورها',
-          W * 0.025,
-          'rgba(255,255,255,0.60)',
+          W * 0.032,
+          'rgba(255,255,255,0.65)',
           0.4
         );
       };
