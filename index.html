@@ -22,6 +22,8 @@ body {
   direction: rtl;
   overflow: hidden;
   height: 100vh;
+  height: -webkit-fill-available;
+  height: 100dvh;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -65,8 +67,8 @@ body {
 
 /* ── Logo reveal: clip-path wipes left → right ── */
 @keyframes logoReveal {
-  0%   { clip-path: inset(0 100% 0 0); opacity: 1; }
-  100% { clip-path: inset(0 0% 0 0);   opacity: 1; }
+  0%   { -webkit-clip-path: inset(0 100% 0 0); clip-path: inset(0 100% 0 0); opacity: 1; }
+  100% { -webkit-clip-path: inset(0 0% 0 0);   clip-path: inset(0 0% 0 0);   opacity: 1; }
 }
 /* After logo lands, content drops in */
 @keyframes dropIn {
@@ -94,17 +96,6 @@ body {
 
 /* Everything below animates with delay after logo finishes */
 .gate-main          { animation: dropIn 0.7s 0.6s ease both; }
-.gate-info-bar {
-  animation: dropIn 0.6s 0.75s ease both;
-  display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;
-  padding: 0 16px; margin-bottom: 6px;
-}
-.gate-info-item {
-  background: rgba(199,168,135,0.08); border: 1px solid rgba(199,168,135,0.18);
-  border-radius: 20px; padding: 4px 12px; font-size: 12px;
-  color: rgba(255,255,255,0.5); font-family: var(--f-body);
-  display: flex; align-items: center; gap: 5px;
-}
 .gate-silhouettes   { animation: dropIn 0.6s 0.85s ease both; }
 
 .gate-main {
@@ -258,7 +249,6 @@ body {
   .gate-horizon { height: clamp(80px, 22vw, 160px); }
 }
 @media (max-width: 380px) {
-  .gate-info-item { font-size: 10px; padding: 3px 6px; }
   .gate-arc-wrap { width: min(240px, 70vw); height: min(120px, 35vw); }
   .gate-title-img { width: 55vw; }
   .gate-input { font-size: 13px; }
@@ -306,13 +296,6 @@ body {
     <img src="assets/اقرب.png" alt="" class="gate-deco-bottom">
   </div>
 
-  <!-- Info bar -->
-  <div class="gate-info-bar" id="gate-info-bar" style="display:none">
-    <span class="gate-info-item" id="gi-date"></span>
-    <span class="gate-info-item" id="gi-time"></span>
-    <span class="gate-info-item" id="gi-venue"></span>
-  </div>
-
   <!-- Slogan -->
   <p class="gate-slogan"><em>اقرب مما ظننا…</em> واجمل مما تخيلنا</p>
 
@@ -350,15 +333,6 @@ fetch(BACKEND_URL + '/api/config')
   .then(d => {
     if (!d) return;
     cfg.requireGuestValidation = !!d.requireGuestValidation;
-    // Populate gate info bar
-    const bar = document.getElementById('gate-info-bar');
-    const date   = d.gateInfoDate   || d.eventDateAr;
-    const time   = d.gateInfoTime   || d.eventStartTime;
-    const venue  = d.gateInfoVenue  || d.venueName;
-    if (date)  document.getElementById('gi-date').textContent  = '📅 ' + date;
-    if (time)  document.getElementById('gi-time').textContent  = '🕐 ' + time;
-    if (venue) document.getElementById('gi-venue').textContent = '📍 ' + venue;
-    if (date || time || venue) bar.style.display = 'flex';
   })
   .catch(() => {});
 fetch(BACKEND_URL + '/api/guests')
