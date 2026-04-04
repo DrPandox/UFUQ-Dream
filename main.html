@@ -916,12 +916,11 @@ html { scrollbar-width: thin; scrollbar-color: rgba(199,168,135,0.2) transparent
     <section class="sec fs" data-anim="fade-scale">
       <div class="sec-lbl">بطاقة الشرف</div>
       <p class="honor-intro">
-        لأن لكل ضيف <em>أثره الخاص</em><br>
-        يمكنك إصدار بطاقة حضور شرفية باسمك<br>
-         ومختومة بختم <em>قابَ حُلم</em>
+        دعوتك الشخصية لحفل التخرج<br>
+        باسمك وبختم <em>قابَ حُلم 2026</em>
       </p>
       <div class="honor-cv-wrap" v-show="honorGenerated">
-        <canvas ref="honorCvRef" width="900" height="540"></canvas>
+        <canvas ref="honorCvRef" width="900" height="1200"></canvas>
       </div>
       <div class="honor-actions" v-show="honorGenerated">
         <button class="btn-gold" @click="downloadHonorCard">تحميل البطاقة</button>
@@ -1310,92 +1309,86 @@ createApp({
       const cv = honorCvRef.value;
       if (!cv) return;
       const ctx = cv.getContext('2d');
-      const W = 900, H = 540;
 
-      // ── Background ──
-      ctx.fillStyle = '#130008';
-      ctx.fillRect(0, 0, W, H);
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
 
-      // Radial crimson glow center
-      const bg = ctx.createRadialGradient(W/2, H/2, 60, W/2, H/2, 400);
-      bg.addColorStop(0,   'rgba(120,8,50,0.32)');
-      bg.addColorStop(0.5, 'rgba(64,4,20,0.18)');
-      bg.addColorStop(1,   'rgba(0,0,0,0)');
-      ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+      img.onload = () => {
+        // Size canvas to match the image aspect ratio (max width 900px)
+        const W = 900;
+        const H = Math.round(img.naturalHeight * (W / img.naturalWidth));
+        cv.width  = W;
+        cv.height = H;
 
-      // Top-right warm glow
-      const tg = ctx.createRadialGradient(W, 0, 20, W, 0, 320);
-      tg.addColorStop(0, 'rgba(199,168,135,0.10)');
-      tg.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = tg; ctx.fillRect(0, 0, W, H);
+        // ── Background image ──
+        ctx.drawImage(img, 0, 0, W, H);
 
-      // ── Borders ──
-      const m = 26;
-      ctx.strokeStyle = 'rgba(199,168,135,0.52)'; ctx.lineWidth = 1.5;
-      ctx.strokeRect(m, m, W-m*2, H-m*2);
-      ctx.strokeStyle = 'rgba(199,168,135,0.14)'; ctx.lineWidth = 0.8;
-      ctx.strokeRect(m+12, m+12, W-(m+12)*2, H-(m+12)*2);
+        ctx.textAlign = 'center';
+        const name = guestName.value || 'ضيفنا الكريم';
 
-      // ── Corner ornaments ──
-      const cs = 48;
-      ctx.strokeStyle = '#c7a887'; ctx.lineWidth = 2;
-      [[m,m,1,1],[W-m,m,-1,1],[m,H-m,1,-1],[W-m,H-m,-1,-1]].forEach(([x,y,dx,dy]) => {
-        ctx.beginPath(); ctx.moveTo(x, y+cs*dy); ctx.lineTo(x, y); ctx.lineTo(x+cs*dx, y); ctx.stroke();
-      });
+        // Helper: draw line with optional text shadow
+        const draw = (txt, size, color, shadowAlpha) => {
+          ctx.font = `${size}px "Amiri","Geeza Pro","Traditional Arabic",Georgia,serif`;
+          ctx.fillStyle = color;
+          ctx.shadowColor = `rgba(0,0,0,${shadowAlpha || 0})`;
+          ctx.shadowBlur  = shadowAlpha ? 10 : 0;
+          ctx.fillText(txt, W / 2, currentY);
+          ctx.shadowBlur = 0;
+        };
 
-      // ── Gradient divider helper ──
-      const divGrad = (y, half = 160) => {
-        const g = ctx.createLinearGradient(W/2-half, y, W/2+half, y);
-        g.addColorStop(0,   'rgba(199,168,135,0)');
-        g.addColorStop(0.5, 'rgba(199,168,135,0.44)');
-        g.addColorStop(1,   'rgba(199,168,135,0)');
-        return g;
+        // ── Position text block in the vertical center of the card ──
+        const lineSmall  = H * 0.055;
+        const lineName   = H * 0.095;
+        const lineGap    = H * 0.030;
+        const totalLines = lineSmall * 2 + lineName + lineSmall * 2 + lineGap + lineSmall;
+        let   currentY   = (H - totalLines) / 2 + lineSmall;
+
+        // Line 1 — invitation opener
+        draw('تتشرف مجموعة مدارس أفق بدعوة', W * 0.033, 'rgba(199,168,135,0.95)', 0.7);
+        currentY += lineSmall;
+
+        // Line 2 — honorific
+        draw('السيد', W * 0.033, 'rgba(255,255,255,0.80)', 0.5);
+        currentY += lineSmall * 1.15;
+
+        // Line 3 — guest name (large, gold, glowing)
+        ctx.font        = `700 ${W * 0.075}px "Amiri","Geeza Pro","Traditional Arabic",Georgia,serif`;
+        ctx.fillStyle   = '#edd1a4';
+        ctx.shadowColor = 'rgba(199,168,135,0.55)';
+        ctx.shadowBlur  = 28;
+        ctx.fillText(name, W / 2, currentY);
+        ctx.shadowBlur  = 0;
+        currentY += lineName;
+
+        // Line 4 — body
+        draw('للحضور الكريم في حفل تخرج', W * 0.033, 'rgba(255,255,255,0.85)', 0.6);
+        currentY += lineSmall;
+
+        // Line 5 — event title
+        draw('قابَ حُلم 2026', W * 0.038, '#edd1a4', 0.6);
+        currentY += lineSmall + lineGap;
+
+        // Line 6 — closing line (smaller, subtle)
+        draw(
+          'لنشهد معًا ليلةً من الفرح والاعتزاز تتجلّى فيها الأحلام في أجمل صورها',
+          W * 0.025,
+          'rgba(255,255,255,0.60)',
+          0.4
+        );
       };
 
-      ctx.textAlign = 'center';
+      img.onerror = () => {
+        // Graceful fallback if image fails to load
+        cv.width = 900; cv.height = 600;
+        ctx.fillStyle = '#130008';
+        ctx.fillRect(0, 0, 900, 600);
+        ctx.fillStyle = '#edd1a4';
+        ctx.font = '28px serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('تعذّر تحميل صورة الدعوة', 450, 300);
+      };
 
-      // ── Top label ──
-      ctx.fillStyle = 'rgba(199,168,135,0.45)';
-      ctx.font = `400 ${W*0.022}px "Cairo","Geeza Pro",Arial,sans-serif`;
-      ctx.fillText('بطاقة حضور شرفية', W/2, m + 56);
-
-      // Divider under label
-      ctx.strokeStyle = divGrad(m+70); ctx.lineWidth = 0.8;
-      ctx.beginPath(); ctx.moveTo(W/2-160, m+70); ctx.lineTo(W/2+160, m+70); ctx.stroke();
-
-      // ── UFUQ brand text ──
-      ctx.fillStyle = 'rgba(137,10,55,0.65)';
-      ctx.font = `600 ${W*0.018}px "Cairo","Geeza Pro",Arial,sans-serif`;
-      ctx.fillText('UFUQ  ·  قاب حُلم  ·  2026', W/2, m + 94);
-
-      // ── Guest name ──
-      const name = guestName.value || 'ضيفنا الكريم';
-      ctx.fillStyle = '#faf7f2';
-      ctx.shadowColor = 'rgba(199,168,135,0.4)';
-      ctx.shadowBlur = 36;
-      ctx.font = `700 ${W*0.078}px "Amiri","Geeza Pro","Traditional Arabic",Georgia,serif`;
-      ctx.fillText(name, W/2, H/2 + 16);
-      ctx.shadowBlur = 0;
-
-      // ── Role tag ──
-      const roleTag = guestRole.value === 'parent' ? '— ولي أمر كريم —' : guestRole.value === 'visitor' ? '— ضيف كريم —' : '— طالب متميز —';
-      ctx.fillStyle = 'rgba(199,168,135,0.58)';
-      ctx.font = `400 ${W*0.026}px "Amiri","Geeza Pro",Georgia,serif`;
-      ctx.fillText(roleTag, W/2, H/2 + 58);
-
-      // Divider above date
-      ctx.strokeStyle = divGrad(H-m-90); ctx.lineWidth = 0.8;
-      ctx.beginPath(); ctx.moveTo(W/2-160, H-m-90); ctx.lineTo(W/2+160, H-m-90); ctx.stroke();
-
-      // ── Event date ──
-      ctx.fillStyle = 'rgba(199,168,135,0.52)';
-      ctx.font = `400 ${W*0.024}px "Amiri","Geeza Pro",Georgia,serif`;
-      ctx.fillText((cfg.eventDateAr || '٢٠ يونيو') + '  ·  ' + (cfg.eventYearAr || '١٤٤٧ هـ — ٢٠٢٦ م'), W/2, H-m-58);
-
-      // ── Bottom brand ──
-      ctx.fillStyle = 'rgba(250,247,242,0.22)';
-      ctx.font = `400 ${W*0.018}px "Cairo","Geeza Pro",Arial,sans-serif`;
-      ctx.fillText('حفل تخرج دفعة قاب حُلم', W/2, H-m-30);
+      img.src = 'assets/invite.jpeg';
     };
 
     const downloadHonorCard = () => {
