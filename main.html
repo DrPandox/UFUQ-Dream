@@ -1347,8 +1347,10 @@ createApp({
         draw('تتشرف مجموعة مدارس أفق بدعوة', W * 0.042, 'rgba(199,168,135,0.95)', 0.7);
         currentY += lineSmall;
 
-        // Line 2 — honorific
-        draw('السيد', W * 0.042, 'rgba(255,255,255,0.85)', 0.5);
+        // Line 2 — honorific based on role
+        const honorific = guestRole.value === 'parent'  ? 'السيد/ة'   :
+                          guestRole.value === 'visitor' ? 'الزائر/ة'  : 'الطالب/ة';
+        draw(honorific, W * 0.042, 'rgba(255,255,255,0.85)', 0.5);
         currentY += lineSmall;
 
         // Line 3 — guest name (large, gold, glowing)
