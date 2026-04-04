@@ -13,15 +13,21 @@
 }
 
 * { margin:0; padding:0; box-sizing:border-box; }
-html { -webkit-text-size-adjust:100%; }
+img, canvas { max-width: 100%; }
+html {
+  -webkit-text-size-adjust: 100%;
+  overflow-x: hidden;        /* prevent RTL horizontal shift on html level */
+  max-width: 100vw;
+}
 
 body {
   background-color: #2a0312;
   color: #faf7f2;
   font-family: var(--f-body);
   direction: rtl;
+  overflow-x: hidden;
+  max-width: 100vw;
   -webkit-font-smoothing: antialiased;
-  /* No overflow:hidden on body — gate is position:fixed, body scroll is irrelevant */
 }
 
 #rainCanvas {
