@@ -322,7 +322,9 @@ body {
 .venue-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(to right,transparent,rgba(137,10,55,0.3),rgba(199,168,135,0.2),transparent); }
 .venue-ico  { width: 46px; height: 46px; margin: 0 auto 14px; background-color: rgba(137,10,55,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(137,10,55,0.2); }
 .venue-nm   { font-family: var(--f-display); font-size: 28px; color: #d9c4a4; margin-bottom: 8px; font-weight: 700; }
-.venue-addr { font-size: 18px; color: rgba(255,255,255,0.72); line-height: 2; margin-bottom: 22px; font-family: var(--f-body); }
+.venue-addr { font-size: 18px; color: rgba(255,255,255,0.72); line-height: 2; margin-bottom: 16px; font-family: var(--f-body); }
+.venue-meta { display: flex; justify-content: center; gap: 18px; margin-bottom: 22px; }
+.venue-meta-item { display: flex; align-items: center; gap: 6px; font-family: var(--f-display); font-size: 16px; color: rgba(199,168,135,0.75); background: rgba(137,10,55,0.12); border: 1px solid rgba(199,168,135,0.12); border-radius: 20px; padding: 5px 14px; }
 .map-btn    { display: inline-flex; align-items: center; gap: 8px; background: transparent; border: 1px solid rgba(199,168,135,0.3); color: #d9c4a4; font-family: var(--f-body); font-size: 17px; padding: 11px 26px; border-radius: 50px; text-decoration: none; -webkit-tap-highlight-color: transparent; }
 .map-btn:active { background-color: rgba(199,168,135,0.08); }
 
@@ -776,6 +778,16 @@ html { scrollbar-width: thin; scrollbar-color: rgba(199,168,135,0.2) transparent
         </div>
         <div class="venue-nm">{{ cfg.venueName }}</div>
         <div class="venue-addr">{{ cfg.venueAddressLine1 }}<br v-if="cfg.venueAddressLine2">{{ cfg.venueAddressLine2 }}</div>
+        <div class="venue-meta">
+          <span class="venue-meta-item">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            {{ cfg.eventDayAr || 'الثلاثاء' }} {{ cfg.gateInfoDate || '28/4' }}
+          </span>
+          <span class="venue-meta-item">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            {{ cfg.gateInfoTime || cfg.doorsOpenTime || '5:00 pm' }}
+          </span>
+        </div>
         <a class="map-btn" :href="cfg.mapLink" target="_blank" rel="noopener noreferrer">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
             <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
