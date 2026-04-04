@@ -20,11 +20,8 @@ body {
   color: #faf7f2;
   font-family: var(--f-body);
   direction: rtl;
-  overflow: hidden;
-  height: 100vh;
-  height: -webkit-fill-available;
-  height: 100dvh;
   -webkit-font-smoothing: antialiased;
+  /* No overflow:hidden on body — gate is position:fixed, body scroll is irrelevant */
 }
 
 #rainCanvas {
@@ -40,6 +37,10 @@ body {
   display: flex; flex-direction: column;
   align-items: center;
   text-align: center;
+  /* Allow scrolling inside gate when keyboard opens on mobile */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  transition: opacity 0.9s ease, -webkit-transform 0.9s ease;
   transition: opacity 0.9s ease, transform 0.9s ease;
   background:
     radial-gradient(ellipse 130% 80% at 100% 0%,
@@ -130,11 +131,15 @@ body {
   width: 100%; background-color: rgba(46,3,15,0.6);
   border: 1px solid rgba(255,255,255,0.18); border-radius: 12px;
   padding: 12px 18px;
-  font-family: var(--f-display); font-size: 16px;
+  font-family: var(--f-display); font-size: 16px; /* never below 16px — prevents iOS auto-zoom */
   color: #faf7f2; text-align: center; direction: rtl;
   outline: none; transition: border-color 0.3s, box-shadow 0.3s;
+  -webkit-appearance: none; /* remove iOS default styling */
+  appearance: none;
 }
 .gate-input:focus { border-color: rgba(199,168,135,0.6); box-shadow: 0 0 20px rgba(199,168,135,0.1); }
+.gate-input::-webkit-input-placeholder { color: rgba(255,255,255,0.28); font-size: 13px; }
+.gate-input::-moz-placeholder { color: rgba(255,255,255,0.28); opacity: 1; }
 .gate-input::placeholder { color: rgba(255,255,255,0.28); font-size: 13px; }
 
 .gate-btn {
@@ -220,6 +225,7 @@ body {
 
 .gate-horizon {
   position: absolute; bottom: -45px; left: 50%;
+  -webkit-transform: translateX(-50%);
   transform: translateX(-50%);
   width: 200%; height: 130px;
   background: radial-gradient(ellipse 100% 100% at 50% 50%,
@@ -227,6 +233,7 @@ body {
     rgba(180, 30, 80, 0.50) 35%,
     rgba(140, 15, 60, 0.20) 60%,
     transparent 80%);
+  -webkit-filter: blur(25px);
   filter: blur(25px);
   border-radius: 50%; pointer-events: none; z-index: 0;
 }
@@ -241,7 +248,7 @@ body {
   .gate-main { padding: 0 14px; }
   .gate-prompt { font-size: clamp(12px, 3.5vw, 14px); margin-bottom: 8px; }
   .gate-input-wrap { max-width: min(88vw, 280px); }
-  .gate-input { font-size: clamp(14px, 4vw, 16px); padding: 10px 14px; }
+  .gate-input { font-size: 16px; padding: 10px 14px; } /* keep 16px to prevent iOS zoom */
   .gate-btn { font-size: clamp(13px, 3.8vw, 15px); padding: 10px; max-width: min(88vw, 280px); }
   .gate-deco-bottom { width: clamp(100px, 44vw, 200px); }
   .gate-silhouettes img { width: min(22vw, 100px); }
@@ -263,7 +270,7 @@ body {
 
   <!-- Logo -->
   <div class="gate-logo-wrap">
-    <img class="gate-logo-icon" src="assets/UFUQ logo.png" alt="UFUQ">
+    <img class="gate-logo-icon" src="assets/UFUQ%20logo.png" alt="UFUQ">
   </div>
 
   <!-- Main -->
@@ -271,7 +278,7 @@ body {
     <div class="gate-arc-wrap">
       <img src="assets/logo.svg" alt="" class="gate-arc-img">
     </div>
-    <img class="gate-title-img" src="assets/قاب حلم.png" alt="قاب حلم">
+    <img class="gate-title-img" src="assets/%D9%82%D8%A7%D8%A8%20%D8%AD%D9%84%D9%85.png" alt="قاب حلم">
     <p class="gate-prompt">سجّل بياناتك للدخول</p>
 
     <div class="role-row">
@@ -283,17 +290,17 @@ body {
     <div class="gate-input-wrap">
       <input class="gate-input" type="text" id="guest-input"
         placeholder="اكتب اسمك هنا" maxlength="30"
-        autocomplete="off" autocorrect="off" spellcheck="false">
+        autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
     </div>
     <div class="gate-input-wrap" style="margin-bottom:10px;">
       <input class="gate-input" type="tel" id="guest-phone"
         placeholder="رقم الجوال" maxlength="15"
-        autocomplete="off" dir="ltr">
+        autocomplete="off" inputmode="tel" dir="ltr">
     </div>
 
     <button class="gate-btn" id="enter-btn">ادخل إلى قاب حلم</button>
     <div class="gate-err" id="gate-err"></div>
-    <img src="assets/اقرب.png" alt="" class="gate-deco-bottom">
+    <img src="assets/%D8%A7%D9%82%D8%B1%D8%A8.png" alt="" class="gate-deco-bottom">
   </div>
 
   <!-- Slogan -->
@@ -387,16 +394,17 @@ document.getElementById('enter-btn').addEventListener('click', enterGate);
 document.getElementById('guest-input').addEventListener('keyup', e => { if (e.key === 'Enter') enterGate(); });
 document.getElementById('guest-phone').addEventListener('keyup', e => { if (e.key === 'Enter') enterGate(); });
 
-// Pre-fill if returning from main page to edit info
+// Pre-fill / auto-skip
 (function prefill() {
+  const isEdit = /[?&]edit/.test(window.location.search); // came from "تعديل البيانات"
   const name  = localStorage.getItem('guestName');
   const phone = localStorage.getItem('guestPhone');
   const role  = localStorage.getItem('guestRole');
   if (name)  document.getElementById('guest-input').value = name;
   if (phone) document.getElementById('guest-phone').value = phone;
   if (role)  setRole(role);
-  // Auto-skip gate if already registered
-  if (name && phone && role) {
+  // Auto-skip only when NOT in edit mode and already have all data
+  if (!isEdit && name && phone && role) {
     document.getElementById('gate').classList.add('hide');
     setTimeout(() => { window.location.href = 'main.html'; }, 0);
   }
