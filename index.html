@@ -363,14 +363,14 @@ function enterGate() {
   if (!selectedRole) { showErr('يرجى اختيار دورك للدخول'); return; }
   if (!name)  { showErr('يرجى كتابة اسمك للدخول'); return; }
   if (!phone) { showErr('يرجى إدخال رقم الجوال'); return; }
-  if (!phone.startsWith('07')) { showErr('رقم الجوال يجب أن يبدأ بـ 07'); return; }
+  if (phone.replace(/\D/g,'').length < 7) { showErr('رقم الجوال غير صحيح'); return; }
   if (cfg.requireGuestValidation) {
     const valid = _guests.some(g => g === name || g.includes(name) || name.includes(g));
     if (!valid) { showErr('عذراً، اسمك غير موجود في قائمة المدعوين', 3000); return; }
   }
-  sessionStorage.setItem('guestName', name);
-  sessionStorage.setItem('guestPhone', phone);
-  sessionStorage.setItem('guestRole', selectedRole);
+  localStorage.setItem('guestName', name);
+  localStorage.setItem('guestPhone', phone);
+  localStorage.setItem('guestRole', selectedRole);
 
   // Notify backend — fire and forget, don't block the UX
   fetch(BACKEND_URL + '/api/register', {
@@ -389,12 +389,17 @@ document.getElementById('guest-phone').addEventListener('keyup', e => { if (e.ke
 
 // Pre-fill if returning from main page to edit info
 (function prefill() {
-  const name  = sessionStorage.getItem('guestName');
-  const phone = sessionStorage.getItem('guestPhone');
-  const role  = sessionStorage.getItem('guestRole');
+  const name  = localStorage.getItem('guestName');
+  const phone = localStorage.getItem('guestPhone');
+  const role  = localStorage.getItem('guestRole');
   if (name)  document.getElementById('guest-input').value = name;
   if (phone) document.getElementById('guest-phone').value = phone;
   if (role)  setRole(role);
+  // Auto-skip gate if already registered
+  if (name && phone && role) {
+    document.getElementById('gate').classList.add('hide');
+    setTimeout(() => { window.location.href = 'main.html'; }, 0);
+  }
 })();
 
 // ─── RAIN ANIMATION (no ctx.filter — uses layered circles) ───

@@ -1003,19 +1003,19 @@ const { createApp, ref, reactive, computed, onMounted, onUnmounted, watch, nextT
 
 createApp({
   setup() {
-    // ─── GUARD: redirect if no gate session ───
-    const guestName = ref(sessionStorage.getItem('guestName') || '');
-    const guestRole = ref(sessionStorage.getItem('guestRole') || 'student');
+    // ─── GUARD: redirect if no saved session ───
+    const guestName = ref(localStorage.getItem('guestName') || '');
+    const guestRole = ref(localStorage.getItem('guestRole') || 'student');
     if (!guestName.value) {
       window.location.replace('index.html');
       return {};
     }
 
-    const greeting = computed(() =>
-      guestRole.value === 'parent'
-        ? `أهلاً بكم، ${guestName.value}`
-        : `أهلاً بك أيها الطالب، ${guestName.value}`
-    );
+    const greeting = computed(() => {
+      if (guestRole.value === 'parent')  return `أهلاً بكم، ${guestName.value}`;
+      if (guestRole.value === 'visitor') return `أهلاً بك، ${guestName.value}`;
+      return `أهلاً بك أيها الطالب، ${guestName.value}`;
+    });
 
     // ─── CONFIG (defaults overwritten by Firebase) ───
     const cfg = reactive({
@@ -1368,7 +1368,7 @@ createApp({
       ctx.shadowBlur = 0;
 
       // ── Role tag ──
-      const roleTag = guestRole.value === 'parent' ? '— ولي أمر كريم —' : '— طالب متميز —';
+      const roleTag = guestRole.value === 'parent' ? '— ولي أمر كريم —' : guestRole.value === 'visitor' ? '— ضيف كريم —' : '— طالب متميز —';
       ctx.fillStyle = 'rgba(199,168,135,0.58)';
       ctx.font = `400 ${W*0.026}px "Amiri","Geeza Pro",Georgia,serif`;
       ctx.fillText(roleTag, W/2, H/2 + 58);
