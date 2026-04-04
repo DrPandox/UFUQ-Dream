@@ -4,8 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>أرشيف قاب حلم — UFUQ</title>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
@@ -272,18 +270,8 @@ body {
 </div>
 
 <script>
-// ══ FIREBASE ══
-const FIREBASE_CONFIG = {
-  apiKey:            "YOUR_API_KEY",
-  authDomain:        "YOUR_PROJECT_ID.firebaseapp.com",
-  databaseURL:       "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
-  projectId:         "YOUR_PROJECT_ID",
-  storageBucket:     "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId:             "YOUR_APP_ID"
-};
-firebase.initializeApp(FIREBASE_CONFIG);
-const db = firebase.database();
+// ══ BACKEND ══
+const BACKEND_URL = 'https://YOUR_DO_APP.ondigitalocean.app'; // ← update after deploy
 
 // ══ STARS ══
 (function initStars() {
@@ -329,10 +317,9 @@ let filteredItems = [];
 let activeYear = 'all';
 let lbIndex = 0;
 
-db.ref('archive').once('value').then(snap => {
+fetch(BACKEND_URL + '/api/archive').then(r => r.json()).then(data => {
   document.getElementById('arc-loading').style.display = 'none';
-  const data = snap.val() || {};
-  allItems = Object.values(data).sort((a, b) => (b.year || 0) - (a.year || 0));
+  allItems = (Array.isArray(data) ? data : []).sort((a, b) => (b.year || 0) - (a.year || 0));
 
   if (allItems.length === 0) {
     document.getElementById('arc-empty').style.display = 'block';

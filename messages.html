@@ -4,8 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>رسائل الليلة — قاب حلم</title>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mokhtarbsaid/rare-arabic-fonts/theyearofthecamel/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600&display=swap" rel="stylesheet">
 
@@ -169,18 +167,8 @@ body {
 <div class="msgs-wrap" id="msgs-wrap"></div>
 
 <script>
-// ── FIREBASE ──
-const FIREBASE_CONFIG = {
-  apiKey:            "YOUR_API_KEY",
-  authDomain:        "YOUR_PROJECT_ID.firebaseapp.com",
-  databaseURL:       "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
-  projectId:         "YOUR_PROJECT_ID",
-  storageBucket:     "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId:             "YOUR_APP_ID"
-};
-firebase.initializeApp(FIREBASE_CONFIG);
-const db = firebase.database();
+// ── BACKEND ──
+const BACKEND_URL = 'https://YOUR_DO_APP.ondigitalocean.app'; // ← update after deploy
 
 // ── STARS ──
 (function() {
@@ -228,24 +216,14 @@ function escHtml(s) {
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-db.ref('messages').on('value', snap => {
+function renderMessages(items) {
   document.getElementById('msgs-loading').style.display = 'none';
-  const data = snap.val() || {};
-  const items = Object.values(data).sort((a,b) => (b.sentAt||0) - (a.sentAt||0));
-
   const count = document.getElementById('msg-count');
   count.textContent = items.length ? `${items.length} رسالة` : '';
-
   const empty = document.getElementById('msgs-empty');
   const wrap  = document.getElementById('msgs-wrap');
-
-  if (items.length === 0) {
-    empty.style.display = 'block';
-    wrap.innerHTML = '';
-    return;
-  }
+  if (items.length === 0) { empty.style.display = 'block'; wrap.innerHTML = ''; return; }
   empty.style.display = 'none';
-
   wrap.innerHTML = items.map((m, i) => `
     <div class="msg-card" style="animation-delay:${Math.min(i * 0.06, 0.6)}s">
       <p class="msg-text">${escHtml(m.text)}</p>
@@ -255,7 +233,17 @@ db.ref('messages').on('value', snap => {
       </div>
     </div>
   `).join('');
-});
+}
+
+function loadMessages() {
+  fetch(BACKEND_URL + '/api/messages')
+    .then(r => r.json())
+    .then(renderMessages)
+    .catch(() => { document.getElementById('msgs-loading').style.display = 'none'; });
+}
+
+loadMessages();
+setInterval(loadMessages, 6000); // refresh every 6 seconds
 </script>
 </body>
 </html>

@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>قاب حلم — UFUQ Graduation 2026</title>
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mokhtarbsaid/rare-arabic-fonts/theyearofthecamel/all.min.css">
 
@@ -755,7 +753,7 @@ html { scrollbar-width: thin; scrollbar-color: rgba(199,168,135,0.2) transparent
       <div class="hero-line"></div>
       <p class="hero-poem">
         <em>قابَ حُلم </em><br>
- هي المَسافةُ الصفر. النقطةُ التي يتوقفُ عندها الزمانُ ليلتقيَ فيها مجهودُ (اثني عشر عاماً) بقطافِ العُمر.
+ هي المَسافةُ صفر... هي النقطةُ التي يتوقفُ عندها الزمانُ ليلتقيَ فيها مجهودُ (اثني عشر عاماً) بقطافِ العُمر.
       </p>
       <div class="scroll-cue">
         <p>تمرير</p>
@@ -766,16 +764,36 @@ html { scrollbar-width: thin; scrollbar-color: rgba(199,168,135,0.2) transparent
       </div>
     </section>
 
-    <!-- COUNTDOWN -->
+    <!-- VENUE -->
     <section class="sec fs" data-anim="slide-up">
-      <div class="sec-lbl">العد التنازلي</div>
+      <h2 class="sec-h">نادي الصيد — القاعة الملكية</h2>
+      <div class="venue-card">
+        <div class="venue-ico">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c7a887" stroke-width="1.6" stroke-linecap="round">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+            <circle cx="12" cy="9" r="2.5"/>
+          </svg>
+        </div>
+        <div class="venue-nm">{{ cfg.venueName }}</div>
+        <div class="venue-addr">{{ cfg.venueAddressLine1 }}<br v-if="cfg.venueAddressLine2">{{ cfg.venueAddressLine2 }}</div>
+        <a class="map-btn" :href="cfg.mapLink" target="_blank" rel="noopener noreferrer">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+            <circle cx="12" cy="9" r="2.5"/>
+          </svg>
+          افتح في الخريطة
+        </a>
+      </div>
+    </section>
+
+        <!-- COUNTDOWN -->
+    <section class="sec fs" data-anim="slide-up">
       <p class="cd-poem">
         ما تبقّى ليس وقتًا<br>
         بل <em>نبضات قليلة</em><br>
         ويصبح الحلم مرئيًا
       </p>
       <div class="cd-wrap">
-        <p class="cd-intro">· العد التنازلي للحظة ·</p>
         <div class="cd-grid">
           <div class="cd-u">
             <span class="cd-n">{{ cd.d }}</span>
@@ -800,32 +818,8 @@ html { scrollbar-width: thin; scrollbar-color: rgba(199,168,135,0.2) transparent
       </div>
     </section>
 
-    <!-- VENUE -->
-    <section class="sec fs" data-anim="slide-up">
-      <div class="sec-lbl">المكان</div>
-      <h2 class="sec-h">نادي الصيد — القاعة الملكية</h2>
-      <div class="venue-card">
-        <div class="venue-ico">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c7a887" stroke-width="1.6" stroke-linecap="round">
-            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
-            <circle cx="12" cy="9" r="2.5"/>
-          </svg>
-        </div>
-        <div class="venue-nm">{{ cfg.venueName }}</div>
-        <div class="venue-addr">{{ cfg.venueAddressLine1 }}<br v-if="cfg.venueAddressLine2">{{ cfg.venueAddressLine2 }}</div>
-        <a class="map-btn" :href="cfg.mapLink" target="_blank" rel="noopener noreferrer">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
-            <circle cx="12" cy="9" r="2.5"/>
-          </svg>
-          افتح في الخريطة
-        </a>
-      </div>
-    </section>
-
     <!-- INSTRUCTIONS -->
     <section class="sec sec-frame fs" data-anim="stagger">
-      <div class="sec-lbl">بروتوكول الحفل</div>
       <h2 class="sec-h">بروتوكول الحفل</h2>
       <div class="card">
         <ul class="instr-list">
@@ -870,7 +864,6 @@ html { scrollbar-width: thin; scrollbar-color: rgba(199,168,135,0.2) transparent
 
     <!-- MESSAGES -->
     <section class="sec fs" data-anim="slide-up">
-      <div class="sec-lbl">رسائل الليلة</div>
       <h2 class="sec-h">اكتب الآن كلمةً تبقى</h2>
       <p class="msg-write-intro">
         رسالة قصيرة — شعور صادق — دعاء — فخر — أو ذكرى<br>
@@ -900,8 +893,7 @@ html { scrollbar-width: thin; scrollbar-color: rgba(199,168,135,0.2) transparent
       <p class="honor-intro">
         لأن لكل ضيف <em>أثره الخاص</em><br>
         يمكنك إصدار بطاقة حضور شرفية باسمك<br>
-        مختومة بتاريخ الليلة<br>
-        وممهورة بهوية <em>قابَ حُلم</em>
+         ومختومة بختم <em>قابَ حُلم</em>
       </p>
       <div class="honor-cv-wrap" v-show="honorGenerated">
         <canvas ref="honorCvRef" width="900" height="540"></canvas>
@@ -915,7 +907,6 @@ html { scrollbar-width: thin; scrollbar-color: rgba(199,168,135,0.2) transparent
 
     <!-- ARCHIVE -->
     <section class="sec fs" data-anim="slide-up">
-      <div class="sec-lbl">الأرشيف</div>
       <p class="archive-poem">
         فصلٌ مضى..<br>
         وبصمةٌ <em>تبقى</em>
@@ -934,7 +925,6 @@ html { scrollbar-width: thin; scrollbar-color: rgba(199,168,135,0.2) transparent
 
     <!-- FROM UFUQ TO THE FUTURE -->
     <section class="sec fs" data-anim="flip">
-      <div class="sec-lbl">الرؤية</div>
       <h2 class="sec-h future-h">من أُفُق<br><em>إلى المستقبل</em></h2>
       <div class="card future-card">
         <p class="future-poem">
@@ -988,20 +978,9 @@ html { scrollbar-width: thin; scrollbar-color: rgba(199,168,135,0.2) transparent
 
 <script>
 // ══════════════════════════════════════════════════════
-//  FIREBASE CONFIG
+//  BACKEND URL — change this after deploying to DigitalOcean
 // ══════════════════════════════════════════════════════
-const FIREBASE_CONFIG = {
-  apiKey:            "YOUR_API_KEY",
-  authDomain:        "YOUR_PROJECT_ID.firebaseapp.com",
-  databaseURL:       "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
-  projectId:         "YOUR_PROJECT_ID",
-  storageBucket:     "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId:             "YOUR_APP_ID"
-};
-
-firebase.initializeApp(FIREBASE_CONFIG);
-const _db = firebase.database();
+const BACKEND_URL = 'https://YOUR_DO_APP.ondigitalocean.app';
 
 // ══════════════════════════════════════════════════════
 const { createApp, ref, reactive, computed, onMounted, onUnmounted, watch, nextTick } = Vue;
@@ -1131,12 +1110,12 @@ createApp({
       msgStatusText.value = '';
       msgStatusType.value = '';
       try {
-        const key = Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
-        await _db.ref('messages/' + key).set({
-          from:  msgFrom.value.trim() || 'ضيف مجهول',
-          text:  msgText.value.trim(),
-          sentAt: Date.now()
+        const res = await fetch(BACKEND_URL + '/api/messages', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ from: msgFrom.value.trim(), text: msgText.value.trim() })
         });
+        if (!res.ok) throw new Error('server error');
         msgText.value       = '';
         msgFrom.value       = '';
         msgStatusText.value = 'وصلت رسالتك ✦ شكراً لك';
@@ -1637,11 +1616,11 @@ createApp({
 
     // ─── LIFECYCLE ───
     onMounted(() => {
-      // Load config from Firebase (live sync)
-      _db.ref('config').on('value', snap => {
-        const d = snap.val();
-        if (d) Object.assign(cfg, d);
-      });
+      // Load config from backend
+      fetch(BACKEND_URL + '/api/config')
+        .then(r => r.json())
+        .then(d => { if (d) Object.assign(cfg, d); })
+        .catch(() => {});  // use defaults silently if backend offline
 
       updateCountdown();
       timerInterval = setInterval(updateCountdown, 1000);

@@ -4,8 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>قاب حلم — UFUQ Graduation 2026</title>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
@@ -323,36 +321,21 @@ body {
 //    http://192.168.1.100:3000   ← your server's LAN IP
 //    http://server.local:3000    ← if you set a hostname
 //
-const BACKEND_URL = 'http://192.168.1.100:3000'; // ← CHANGE THIS
-
-// ══════════════════════════════════════════════════════
-const FIREBASE_CONFIG = {
-  apiKey:            "YOUR_API_KEY",
-  authDomain:        "YOUR_PROJECT_ID.firebaseapp.com",
-  databaseURL:       "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
-  projectId:         "YOUR_PROJECT_ID",
-  storageBucket:     "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId:             "YOUR_APP_ID"
-};
-
-firebase.initializeApp(FIREBASE_CONFIG);
-const _db = firebase.database();
+const BACKEND_URL = 'https://YOUR_DO_APP.ondigitalocean.app'; // ← CHANGE THIS after deploying
 
 // ─── STATE ───
 const cfg = { requireGuestValidation: false };
-const _guests = {};
+const _guests = [];
 
-// Load config from Firebase (once — no live sync needed on gate page)
-_db.ref('config').once('value', snap => {
-  const d = snap.val();
-  if (!d) return;
-  cfg.requireGuestValidation = !!d.requireGuestValidation;
-});
-_db.ref('guests').once('value', snap => {
-  const d = snap.val();
-  if (d) Object.assign(_guests, d);
-});
+// Load config + guest list from backend
+fetch(BACKEND_URL + '/api/config')
+  .then(r => r.json())
+  .then(d => { if (d) cfg.requireGuestValidation = !!d.requireGuestValidation; })
+  .catch(() => {});
+fetch(BACKEND_URL + '/api/guests')
+  .then(r => r.json())
+  .then(list => { if (Array.isArray(list)) _guests.push(...list); })
+  .catch(() => {});
 
 // ─── GATE LOGIC ───
 let selectedRole = null;
@@ -379,8 +362,7 @@ function enterGate() {
   if (!phone) { showErr('يرجى إدخال رقم الجوال'); return; }
   if (!phone.startsWith('07')) { showErr('رقم الجوال يجب أن يبدأ بـ 07'); return; }
   if (cfg.requireGuestValidation) {
-    const list  = Object.keys(_guests);
-    const valid = list.some(g => g === name || g.includes(name) || name.includes(g));
+    const valid = _guests.some(g => g === name || g.includes(name) || name.includes(g));
     if (!valid) { showErr('عذراً، اسمك غير موجود في قائمة المدعوين', 3000); return; }
   }
   sessionStorage.setItem('guestName', name);
