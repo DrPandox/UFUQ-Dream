@@ -1136,8 +1136,51 @@ createApp({
     const msgStatusText = ref('');
     const msgStatusType = ref('');
 
+    // ─── BAD WORDS FILTER ───
+    const BAD_WORDS = [
+      // Arabic profanity & insults
+      'كلب','كلبة','حمار','حمارة','عاهرة','شرموطة','شرموط','زاني','زانية','قحبة','قحب',
+      'منيوك','منيوكة','ابن الكلب','ابن القحبة','ابن الشرموطة','يلعن','لعنة','خول','خولة',
+      'مخنث','عرص','طيز','كس','كسك','كسمك','نيك','ينيك','مص','يمص','زب','أير','بظر',
+      'ناكك','منايك','حيوان','وسخ','وسخة','سافل','سافلة','غبي','غبية','أحمق','حمقاء',
+      'تافه','تافهة','نجس','نجسة','خنزير','خنزيرة','قرد','قردة','بهيمة','جاهل','جاهلة',
+      'فاجر','فاجرة','فاسق','فاسقة','منافق','منافقة','كافر','كافرة',
+      // English profanity
+      'fuck','fucker','fucking','fucked','fck','f*ck','f**k',
+      'shit','shitting','shitty','sh*t','sht',
+      'bitch','bitches','bitching','b*tch',
+      'asshole','ass hole','arsehole','a**hole',
+      'bastard','bastards',
+      'cunt','cunts','c*nt',
+      'dick','dicks','d*ck',
+      'cock','cocks','c*ck',
+      'pussy','pussies','p*ssy',
+      'whore','whores','wh*re',
+      'slut','sluts','sl*t',
+      'nigger','nigga','n*gger','n*gga',
+      'damn','dammit',
+      'hell','hells',
+      'retard','retarded','retards',
+      'idiot','idiots','stupid','moron','morons','dumbass','dumb ass',
+      'faggot','fag','f*ggot',
+      'piss','pissing','pissed',
+      'sex','sexy','porn','pornography','nude','nudes',
+      'kill','murder','rape','rapist','terrorist','terrorism',
+    ];
+    const _badRe = new RegExp(
+      BAD_WORDS.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'),
+      'i'
+    );
+    const containsBadWord = (text) => _badRe.test(text.replace(/\s+/g, ' '));
+
     const submitMessage = async () => {
       if (!msgText.value.trim()) return;
+      if (containsBadWord(msgText.value) || containsBadWord(msgFrom.value)) {
+        msgStatusText.value = 'رسالتك تحتوي على كلمات غير لائقة، يُرجى تعديلها';
+        msgStatusType.value = 'err';
+        setTimeout(() => { msgStatusText.value = ''; }, 5000);
+        return;
+      }
       msgSending.value    = true;
       msgStatusText.value = '';
       msgStatusType.value = '';
