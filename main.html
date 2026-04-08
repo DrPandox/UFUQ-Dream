@@ -89,7 +89,7 @@ body {
 }
 
 /* Hero full-screen with extra breathing room */
-.page > .hero { padding: 100px max(28px, calc(50% - 280px)) 40px; min-height: 100vh; min-height: 100svh; }
+.page > .hero { padding: 60px max(28px, calc(50% - 280px)) 40px; min-height: 100vh; min-height: 100svh; }
 
 /* Content sections */
 .page > .sec { padding: 72px max(20px, calc(50% - 280px)); }
@@ -652,9 +652,9 @@ body {
 .footer-q em  { color: var(--c-headline); font-style: normal; }
 .footer-sub   { font-size: var(--sz-body); color: var(--c-body); letter-spacing: 1px; font-family: var(--f-body); margin-bottom: 6px; opacity: 0.6; }
 .footer-brand { font-size: 10px; color: #6b2438; letter-spacing: 3px; font-family: var(--f-body); }
-.footer-credit { margin-top: 28px; font-size: 11px; color: rgba(199,168,135,0.2); font-family: var(--f-body); letter-spacing: 1.5px; }
-.footer-credit a { color: rgba(199,168,135,0.35); text-decoration: none; transition: color 0.25s; }
-.footer-credit a:hover { color: rgba(199,168,135,0.7); }
+.footer-credit { margin-top: 28px; font-size: 14px; color: rgba(255,255,255,0.75); font-family: var(--f-body); letter-spacing: 1.5px; }
+.footer-credit a { color: #fff; text-decoration: none; transition: color 0.25s; }
+.footer-credit a:hover { color: var(--gold-l); }
 
 /* ══ SCROLLBAR (page snap container + photo frame) ══ */
 ::-webkit-scrollbar { width: 3px; }
@@ -890,12 +890,15 @@ html { scrollbar-width: thin; scrollbar-color: rgba(199,168,135,0.2) transparent
 
     <!-- MESSAGES -->
     <section class="sec fs" data-anim="slide-up">
-      <h2 class="sec-h">اكتب الآن كلمةً تبقى</h2>
-      <p class="msg-write-intro">
+      <div class="sec-lbl">رسائل الليلة</div>
+      <p class="honor-intro">
         رسالة قصيرة — شعور صادق — دعاء — فخر — أو ذكرى<br>
         <em>وقد تكون كلمتك جزءًا من ذاكرة هذه الليلة</em>
       </p>
-      <div class="msg-form">
+      <div v-if="!msgFormOpen" style="text-align:center">
+        <button class="honor-gen-btn" @click="msgFormOpen = true">✦ اكتب رسالتك</button>
+      </div>
+      <div v-else class="msg-form">
         <input class="msg-field" v-model="msgFrom" placeholder="اسمك (اختياري)" maxlength="60">
         <textarea class="msg-field msg-textarea" v-model="msgText" placeholder="اكتب رسالتك هنا…" maxlength="400"></textarea>
         <div class="msg-send-row">
@@ -930,23 +933,6 @@ html { scrollbar-width: thin; scrollbar-color: rgba(199,168,135,0.2) transparent
       <button class="honor-gen-btn" v-show="!honorGenerated" @click="generateHonorCard">✦ أنشئ بطاقتك</button>
     </section>
 
-    <!-- ARCHIVE -->
-    <section class="sec fs" data-anim="slide-up">
-      <p class="archive-poem">
-        فصلٌ مضى..<br>
-        وبصمةٌ <em>تبقى</em>
-      </p>
-      <p class="archive-body">
-        هكذا احتفينا سابقًا<br>
-        هنا، في هذا المكان، لمس الحلم اسمه الأخير العام الماضي.<br>
-        صور، مشاعر، ولحظات صعود سكنت الذاكرة..<br>
-        نفتح لكم نافذة على <em style="color:rgba(217,196,164,0.6);font-style:normal;">ميراث قاب حلم</em>
-      </p>
-      <a class="archive-open-btn" href="archive.html">
-        <span class="arc-icon">◈</span>
-        <span>افتح الأرشيف</span>
-      </a>
-    </section>
 
     <!-- FROM UFUQ TO THE FUTURE -->
     <section class="sec fs" data-anim="flip">
@@ -1124,6 +1110,7 @@ createApp({
     };
 
     // ─── MESSAGES ───
+    const msgFormOpen   = ref(false);
     const msgFrom       = ref('');
     const msgText       = ref('');
     const msgSending    = ref(false);
@@ -1199,6 +1186,7 @@ createApp({
         const data = await res.json();
         msgText.value       = '';
         msgFrom.value       = '';
+        msgFormOpen.value   = false;
         msgStatusText.value = data.pending
           ? 'وصلت رسالتك ✦ ستظهر بعد مراجعتها'
           : 'وصلت رسالتك ✦ شكراً لك';
@@ -1764,7 +1752,7 @@ createApp({
       guestName, guestRole, greeting, cfg, cd,
       starsBgRef, heroPtclRef, audioRef, isMusicPlaying, musicMuted, toggleMusic,
       honorCvRef, honorGenerated, generateHonorCard, drawHonorCard, downloadHonorCard,
-      msgFrom, msgText, msgSending, msgStatusText, msgStatusType, submitMessage
+      msgFormOpen, msgFrom, msgText, msgSending, msgStatusText, msgStatusType, submitMessage
     };
   }
 }).mount('#app');
