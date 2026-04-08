@@ -449,7 +449,7 @@ body {
   padding: 15px; border-radius: 14px; cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: border-color 0.25s, background 0.25s, transform 0.2s;
-  letter-spacing: 1px;
+  letter-spacing: 1px; text-align: center;
 }
 .honor-gen-btn:hover  { border-color: rgba(199,168,135,0.6); background: rgba(199,168,135,0.08); }
 .honor-gen-btn:active { transform: scale(0.97); opacity: 0.85; }
@@ -905,12 +905,25 @@ html { scrollbar-width: thin; scrollbar-color: rgba(199,168,135,0.2) transparent
         </div>
         <div class="msg-status" :class="msgStatusType">{{ msgStatusText }}</div>
         <div style="text-align:center">
-          <a class="honor-gen-btn" href="messages.html" target="_blank" style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          <a class="honor-gen-btn" href="messages.html" target="_blank" style="display:block;text-decoration:none;">
             شاهد رسائل الليلة
           </a>
         </div>
       </div>
+    </section>
+
+    <!-- ARCHIVE -->
+    <section class="sec fs" data-anim="slide-up">
+      <p class="archive-poem">
+        فصلٌ مضى..<br>
+        وبصمةٌ <em>تبقى</em>
+      </p>
+      <p class="archive-body">
+        هكذا احتفينا سابقًا<br>
+        هنا، في هذا المكان، لمس الحلم اسمه الأخير العام الماضي.<br>
+        صور، مشاعر، ولحظات صعود سكنت الذاكرة..<br>
+        نفتح لكم نافذة على <em style="color:rgba(217,196,164,0.6);font-style:normal;">ميراث قاب حلم</em>
+      </p>
     </section>
 
     <!-- HONOR CARD -->
