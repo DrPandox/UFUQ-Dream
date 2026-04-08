@@ -216,10 +216,10 @@ body {
 .hero-poem      { position:relative;z-index:2; font-family: var(--f-display); font-size: var(--sz-body); line-height: 2.15; color: var(--c-body); max-width: 272px;
                   animation: hFadeUp 1.0s 1.75s both ease; }
 .hero-poem em   { color: var(--c-headline); font-style: normal; }
-.scroll-cue     { position: absolute; bottom: 22px; left: 50%; text-align: center;
+.scroll-cue     { position: absolute; bottom: 22px; left: 50%; text-align: center; transform: translateX(-50%);
                   animation: hBobIn 1.0s 2.4s both ease, bob 2.6s 3.4s ease-in-out infinite; }
-.scroll-cue p   { font-size: 13px; color: #c7a887; letter-spacing: 2px; margin-bottom: 4px; }
-.scroll-cue svg { width: 18px; }
+.scroll-cue p   { font-size: 22px; color: #ffffff; letter-spacing: 2px; margin-bottom: 6px; font-family: var(--f-display); font-weight: 700; text-shadow: 0 2px 12px rgba(0,0,0,0.4); }
+.scroll-cue svg { width: 26px; }
 
 /* ══ DIVIDERS ══ */
 .div-orn  { display: flex; align-items: center; justify-content: center; padding: 8px 26px; }
@@ -778,6 +778,13 @@ html { scrollbar-width: thin; scrollbar-color: rgba(199,168,135,0.2) transparent
         <em>قابَ حُلم </em><br>
  هي المَسافةُ صفر... هي النقطةُ التي يتوقفُ عندها الزمانُ ليلتقيَ فيها مجهودُ (اثني عشر عاماً) بقطافِ العُمر.
       </p>
+      <div class="scroll-cue">
+        <p>قم بالتمرير</p>
+        <svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <polyline points="5,13 12,19 19,13"/>
+        </svg>
+      </div>
     </section>
 
     <!-- VENUE -->
