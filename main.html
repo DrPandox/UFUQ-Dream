@@ -890,15 +890,12 @@ html { scrollbar-width: thin; scrollbar-color: rgba(199,168,135,0.2) transparent
 
     <!-- MESSAGES -->
     <section class="sec fs" data-anim="slide-up">
-      <div class="sec-lbl">رسائل الليلة</div>
-      <p class="honor-intro">
+      <h2 class="sec-h">اكتب الآن كلمةً تبقى</h2>
+      <p class="msg-write-intro">
         رسالة قصيرة — شعور صادق — دعاء — فخر — أو ذكرى<br>
         <em>وقد تكون كلمتك جزءًا من ذاكرة هذه الليلة</em>
       </p>
-      <div v-if="!msgFormOpen" style="text-align:center">
-        <button class="honor-gen-btn" @click="msgFormOpen = true">✦ اكتب رسالتك</button>
-      </div>
-      <div v-else class="msg-form">
+      <div class="msg-form">
         <input class="msg-field" v-model="msgFrom" placeholder="اسمك (اختياري)" maxlength="60">
         <textarea class="msg-field msg-textarea" v-model="msgText" placeholder="اكتب رسالتك هنا…" maxlength="400"></textarea>
         <div class="msg-send-row">
@@ -908,7 +905,7 @@ html { scrollbar-width: thin; scrollbar-color: rgba(199,168,135,0.2) transparent
         </div>
         <div class="msg-status" :class="msgStatusType">{{ msgStatusText }}</div>
         <div style="text-align:center">
-          <a class="msg-view-link" href="messages.html" target="_blank">
+          <a class="honor-gen-btn" href="messages.html" target="_blank" style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
             شاهد رسائل الليلة
           </a>
@@ -1110,7 +1107,6 @@ createApp({
     };
 
     // ─── MESSAGES ───
-    const msgFormOpen   = ref(false);
     const msgFrom       = ref('');
     const msgText       = ref('');
     const msgSending    = ref(false);
@@ -1186,7 +1182,6 @@ createApp({
         const data = await res.json();
         msgText.value       = '';
         msgFrom.value       = '';
-        msgFormOpen.value   = false;
         msgStatusText.value = data.pending
           ? 'وصلت رسالتك ✦ ستظهر بعد مراجعتها'
           : 'وصلت رسالتك ✦ شكراً لك';
@@ -1752,7 +1747,7 @@ createApp({
       guestName, guestRole, greeting, cfg, cd,
       starsBgRef, heroPtclRef, audioRef, isMusicPlaying, musicMuted, toggleMusic,
       honorCvRef, honorGenerated, generateHonorCard, drawHonorCard, downloadHonorCard,
-      msgFormOpen, msgFrom, msgText, msgSending, msgStatusText, msgStatusType, submitMessage
+      msgFrom, msgText, msgSending, msgStatusText, msgStatusType, submitMessage
     };
   }
 }).mount('#app');
