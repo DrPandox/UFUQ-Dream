@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -n \"msgFrom, msgText, msgSending\\\\|return {\" /home/drpandox/Documents/Niubabel_Work/UFUQ-Dream/main.html)",
+      "Bash(ssh -i ~/.ssh/id_ed25519 root@138.68.79.195 'pm2 restart ufuq-backend')"
+    ]
+  }
+}
