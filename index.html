@@ -300,8 +300,8 @@ body {
     </div>
     <div class="gate-input-wrap" style="margin-bottom:10px;">
       <input class="gate-input" type="tel" id="guest-phone"
-        placeholder="رقم الجوال" maxlength="15"
-        autocomplete="off" inputmode="tel" dir="ltr">
+        placeholder="07XXXXXXXXX" maxlength="11"
+        autocomplete="off" inputmode="numeric" dir="ltr">
     </div>
 
     <button class="gate-btn" id="enter-btn">ادخل إلى قاب حلم</button>
@@ -375,7 +375,7 @@ function enterGate() {
   if (!selectedRole) { showErr('يرجى اختيار دورك للدخول'); return; }
   if (!name)  { showErr('يرجى كتابة اسمك للدخول'); return; }
   if (!phone) { showErr('يرجى إدخال رقم الجوال'); return; }
-  if (phone.replace(/\D/g,'').length < 7) { showErr('رقم الجوال غير صحيح'); return; }
+  if (!/^07\d{9}$/.test(phone)) { showErr('رقم الجوال يجب أن يبدأ بـ 07 ويتكون من 11 رقم'); return; }
   if (cfg.requireGuestValidation) {
     const valid = _guests.some(g => g === name || g.includes(name) || name.includes(g));
     if (!valid) { showErr('عذراً، اسمك غير موجود في قائمة المدعوين', 3000); return; }
