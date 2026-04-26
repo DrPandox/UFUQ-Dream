@@ -345,7 +345,7 @@ canvas#confetti-cv { position:fixed; inset:0; pointer-events:none; z-index:101; 
 
     <div class="sec-lbl">اللحظة الخاصة</div>
     <h2 class="sec-h">التقط صورتك مع الإطار</h2>
-    <p class="sec-sub">شاركها على إنستغرام مع @ufuqschools @ufuq_primary_school @niubabel</p>
+    <p class="sec-sub">شاركها على إنستغرام مع @ufuqschools @ufuq_primary_school</p>
 
     <!-- Step 1: choose photo source -->
     <template v-if="!photoReady && !cameraOn">
@@ -399,7 +399,7 @@ canvas#confetti-cv { position:fixed; inset:0; pointer-events:none; z-index:101; 
       <div class="pub-check">✨</div>
       <div class="pub-msg">تم حفظ الصورة!</div>
       <p class="pub-sub">انسخ النص وانشر الصورة على إنستغرام</p>
-      <div class="pub-caption-box" id="share-caption">نحن الآن قاب حلم ✨ <br>@ufuqschools <br>@ufuq_primary_school <br>@niubabel <br>#قاب_حلم_2026</div>
+      <div class="pub-caption-box" id="share-caption">نحن الآن قاب حلم ✨ <br>@ufuqschools <br>@ufuq_primary_school <br>#قاب_حلم_2026</div>
       <button class="pub-copy-btn" @click="copyCaption">
         <span>{{ captionCopied ? '✓ تم النسخ' : 'انسخ النص' }}</span>
       </button>
@@ -581,7 +581,7 @@ createApp({
 
     // ─── Publish ───
     const captionCopied = Vue.ref(false);
-    const CAPTION = 'نحن الآن قاب حلم ✨ \n@ufuqschools \n@ufuq_primary_school \n@niubabel \n#قاب_حلم_2026';
+    const CAPTION = 'نحن الآن قاب حلم ✨ \n@ufuqschools \n@ufuq_primary_school \n#قاب_حلم_2026';
 
     const copyCaption = async () => {
       try {
