@@ -321,11 +321,40 @@ createApp({
     let _stream   = null;
     let _userImg  = null;
 
+    // Transparent window inside the frame (detected on load)
+    let _photoArea = null; // { x, y, w, h } in frame pixels
+
+    // Detect the bounding box of transparent pixels in the frame
+    function detectPhotoArea(img) {
+      const tmp = document.createElement('canvas');
+      tmp.width  = img.naturalWidth;
+      tmp.height = img.naturalHeight;
+      const ctx  = tmp.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      const data = ctx.getImageData(0, 0, tmp.width, tmp.height).data;
+      let minX = tmp.width, maxX = 0, minY = tmp.height, maxY = 0;
+      for (let y = 0; y < tmp.height; y++) {
+        for (let x = 0; x < tmp.width; x++) {
+          const alpha = data[(y * tmp.width + x) * 4 + 3];
+          if (alpha < 50) { // transparent pixel
+            if (x < minX) minX = x;
+            if (x > maxX) maxX = x;
+            if (y < minY) minY = y;
+            if (y > maxY) maxY = y;
+          }
+        }
+      }
+      // Fallback: full canvas if no transparency found
+      if (minX >= maxX || minY >= maxY) return { x: 0, y: 0, w: tmp.width, h: tmp.height };
+      return { x: minX, y: minY, w: maxX - minX, h: maxY - minY };
+    }
+
     // Load frame PNG — set canvas size to its exact dimensions
     const frameImg = new Image();
     frameImg.onload = () => {
       CW.value = frameImg.naturalWidth;
       CH.value = frameImg.naturalHeight;
+      _photoArea = detectPhotoArea(frameImg);
       if (_userImg) renderFrame(_userImg); // re-render if photo already loaded
     };
     frameImg.src = 'assets/frame.png';
@@ -387,7 +416,7 @@ createApp({
       const cv = fCvRef.value;
       if (!cv || !img) return;
       const W = CW.value, H = CH.value;
-      if (!W || !H) return; // frame not loaded yet
+      if (!W || !H) return;
       const c = cv.getContext('2d');
       c.clearRect(0, 0, W, H);
 
@@ -395,10 +424,17 @@ createApp({
       c.fillStyle = '#7a0a2a';
       c.fillRect(0, 0, W, H);
 
-      // Draw user photo centered/cropped to fill canvas
-      const sc = Math.max(W / img.width, H / img.height);
-      const dw = img.width * sc, dh = img.height * sc;
-      c.drawImage(img, (W - dw) / 2, (H - dh) / 2, dw, dh);
+      // Draw user photo scaled to fill only the transparent window area
+      const area = _photoArea || { x: 0, y: 0, w: W, h: H };
+      const sc   = Math.max(area.w / img.width, area.h / img.height);
+      const dw   = img.width * sc, dh = img.height * sc;
+      // Clip to the photo window so it doesn't bleed into the frame border
+      c.save();
+      c.beginPath();
+      c.rect(area.x, area.y, area.w, area.h);
+      c.clip();
+      c.drawImage(img, area.x + (area.w - dw) / 2, area.y + (area.h - dh) / 2, dw, dh);
+      c.restore();
 
       // Draw frame on top at its exact natural size
       c.drawImage(frameImg, 0, 0, W, H);
