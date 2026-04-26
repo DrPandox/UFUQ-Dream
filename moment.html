@@ -183,11 +183,61 @@ body {
   0%,100% { opacity:0; transform:scale(0); }
   45%,55% { opacity:var(--a,0.65); transform:scale(1); }
 }
+
+/* ── Winner spin overlay ── */
+#winner-overlay {
+  display:none; position:fixed; inset:0; z-index:100;
+  background:radial-gradient(ellipse at center, #3a0010 0%, #1a0008 100%);
+  flex-direction:column; align-items:center; justify-content:center;
+  padding:24px;
+}
+#winner-overlay.active { display:flex; }
+.win-title {
+  font-family:var(--f-display); font-size:clamp(22px,6vw,32px);
+  color:var(--gold); margin-bottom:4px; text-align:center;
+}
+.win-sub { font-size:13px; color:#833943; margin-bottom:24px; text-align:center; }
+.win-wheel-wrap { position:relative; margin-bottom:20px; }
+.win-needle {
+  position:absolute; top:-18px; left:50%; transform:translateX(-50%);
+  font-size:32px; line-height:1; filter:drop-shadow(0 2px 6px rgba(0,0,0,0.7));
+}
+.win-result {
+  text-align:center; min-height:80px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+}
+.win-winner-name {
+  font-family:var(--f-display); font-size:clamp(28px,8vw,48px);
+  color:var(--gold-l); font-weight:700; margin-bottom:6px;
+  animation:winPop 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+@keyframes winPop {
+  0%   { transform:scale(0.4); opacity:0; }
+  100% { transform:scale(1);   opacity:1; }
+}
+.win-again-btn {
+  margin-top:20px; background:linear-gradient(135deg,#c7a887,#907055);
+  color:#38040f; font-family:var(--f-display); font-size:16px;
+  font-weight:700; padding:13px 36px; border-radius:10px; border:none;
+  cursor:pointer; -webkit-tap-highlight-color:transparent;
+  box-shadow:0 4px 20px rgba(199,168,135,0.3);
+}
 </style>
 </head>
 <body>
 
 <canvas id="starsBg"></canvas>
+
+<!-- Winner spin overlay — shown when admin activates winner mode -->
+<div id="winner-overlay">
+  <div class="win-title">🏆 اختيار الفائز</div>
+  <p class="win-sub">قاب حلم 2026 — @ufuq</p>
+  <div class="win-wheel-wrap">
+    <div class="win-needle">▼</div>
+    <canvas id="win-canvas" width="300" height="300"></canvas>
+  </div>
+  <div class="win-result" id="win-result"></div>
+</div>
 
 <div class="sp">
   <div class="sp-o" style="width:280px;height:280px;top:-80px;right:-90px;--c:rgba(199,168,135,0.10);--t:10s;--d:0s;--x1:18px;--y1:22px;--x2:-12px;--y2:16px;"></div>
@@ -508,6 +558,117 @@ createApp({
     };
   }
 }).mount('#app');
+
+// ══ WINNER SPIN ══════════════════════════════════════════
+const BACKEND_URL_WIN = 'https://138-68-79-195.nip.io';
+const COLORS_W = ['#7a0a2a','#4a0618','#9a1a3a','#c8a45a','#3a0414','#8a1a2a','#5a3a00','#6a0a20'];
+
+let _winParticipants = [];
+let _winAnimFrame    = null;
+let _winnerMode      = false;
+let _winnersShown    = [];
+let _spinning        = false;
+
+const winOverlay = document.getElementById('winner-overlay');
+const winCanvas  = document.getElementById('win-canvas');
+const winCtx     = winCanvas.getContext('2d');
+const winResult  = document.getElementById('win-result');
+
+function drawWinWheel(angle) {
+  const n = _winParticipants.length;
+  if (n === 0) return;
+  const W = winCanvas.width, H = winCanvas.height;
+  const R = W / 2 - 6, cx = W / 2, cy = H / 2;
+  const arc = (Math.PI * 2) / n;
+  winCtx.clearRect(0, 0, W, H);
+  for (let i = 0; i < n; i++) {
+    const s = angle + i * arc, e = s + arc;
+    winCtx.beginPath(); winCtx.moveTo(cx, cy);
+    winCtx.arc(cx, cy, R, s, e); winCtx.closePath();
+    winCtx.fillStyle = COLORS_W[i % COLORS_W.length]; winCtx.fill();
+    winCtx.strokeStyle = 'rgba(199,168,135,0.25)'; winCtx.lineWidth = 1; winCtx.stroke();
+    winCtx.save();
+    winCtx.translate(cx, cy); winCtx.rotate(s + arc / 2);
+    winCtx.textAlign = 'right'; winCtx.fillStyle = '#f0e4cc';
+    winCtx.font = `bold ${Math.max(9, Math.floor(R * 0.11))}px Cairo,Arial`;
+    const lbl = _winParticipants[i].length > 7 ? _winParticipants[i].slice(0, 7) + '…' : _winParticipants[i];
+    winCtx.fillText(lbl, R - 10, 5);
+    winCtx.restore();
+  }
+  winCtx.beginPath(); winCtx.arc(cx, cy, 22, 0, Math.PI * 2);
+  winCtx.fillStyle = '#c8a45a'; winCtx.fill();
+  winCtx.strokeStyle = '#fff'; winCtx.lineWidth = 2.5; winCtx.stroke();
+}
+
+function startSpin() {
+  if (_spinning || _winParticipants.length === 0) return;
+  _spinning = true;
+  winResult.innerHTML = '';
+  let angle = Math.random() * Math.PI * 2;
+  const duration = 3500 + Math.random() * 2000;
+  const start = performance.now();
+  function animate(now) {
+    const t = Math.min((now - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - t, 4); // ease-out quartic
+    const totalRot = (Math.PI * 2) * (8 + Math.random() * 4); // 8-12 full rotations
+    angle = ease * totalRot;
+    drawWinWheel(angle);
+    if (t < 1) {
+      _winAnimFrame = requestAnimationFrame(animate);
+    } else {
+      _spinning = false;
+      pickWinner(angle);
+    }
+  }
+  if (_winAnimFrame) cancelAnimationFrame(_winAnimFrame);
+  requestAnimationFrame(animate);
+}
+
+function pickWinner(finalAngle) {
+  const n = _winParticipants.length;
+  const arc = (Math.PI * 2) / n;
+  // Needle points up (−π/2), find which slice is at the top
+  const normalized = ((-finalAngle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+  const idx = Math.floor(normalized / arc) % n;
+  const winner = _winParticipants[idx];
+  _winnersShown.push(winner);
+
+  const medals = ['🥇','🥈','🥉','🏅','🏅'];
+  const medal  = medals[Math.min(_winnersShown.length - 1, medals.length - 1)];
+  winResult.innerHTML = `
+    <div class="win-winner-name">${medal} ${winner}</div>
+    <button class="win-again-btn" onclick="startSpin()">دورة أخرى ✨</button>`;
+}
+
+// Poll config every 3 seconds to detect winner mode
+function pollWinnerMode() {
+  fetch(BACKEND_URL_WIN + '/api/config')
+    .then(r => r.json())
+    .then(cfg => {
+      const on = !!cfg.winnerMode;
+      if (on && !_winnerMode) {
+        // Entering winner mode — load participants and show overlay
+        _winnerMode = true;
+        _winnersShown = [];
+        fetch(BACKEND_URL_WIN + '/api/winners/participants')
+          .then(r => r.json())
+          .then(names => {
+            _winParticipants = names.length ? names : ['مشارك'];
+            drawWinWheel(0);
+            winOverlay.classList.add('active');
+            setTimeout(startSpin, 800); // auto-start first spin
+          });
+      } else if (!on && _winnerMode) {
+        // Exiting winner mode
+        _winnerMode = false;
+        winOverlay.classList.remove('active');
+        if (_winAnimFrame) cancelAnimationFrame(_winAnimFrame);
+      }
+    }).catch(() => {});
+}
+
+setInterval(pollWinnerMode, 3000);
+pollWinnerMode(); // check immediately on load
 </script>
 </body>
 </html>
