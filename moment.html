@@ -290,6 +290,35 @@ canvas#confetti-cv { position:fixed; inset:0; pointer-events:none; z-index:101; 
 }
 .win-pick-btn:active { transform:scale(0.96); }
 .win-pick-btn:disabled { opacity:0.4; cursor:not-allowed; transform:none; }
+
+/* Winner announcement view */
+#win-announce {
+  display:none; flex-direction:column; align-items:center;
+  justify-content:center; width:100%; text-align:center;
+}
+#win-announce.show { display:flex; }
+@keyframes announceIn {
+  0%   { opacity:0; transform:scale(0.6) translateY(20px); }
+  60%  { transform:scale(1.06) translateY(-6px); }
+  100% { opacity:1; transform:scale(1) translateY(0); }
+}
+.ann-label {
+  font-size:13px; letter-spacing:4px; color:rgba(199,168,135,0.5);
+  margin-bottom:12px; font-weight:600;
+}
+.ann-title {
+  font-family:var(--f-display); font-size:clamp(16px,4vw,22px);
+  color:rgba(199,168,135,0.7); margin-bottom:20px;
+}
+.ann-name {
+  font-family:var(--f-display); font-size:clamp(32px,9vw,56px);
+  color:var(--gold); font-weight:700; line-height:1.2;
+  text-shadow:0 0 60px rgba(199,168,135,0.6), 0 0 20px rgba(199,168,135,0.4);
+  animation:announceIn 0.8s cubic-bezier(0.34,1.56,0.64,1) both;
+  margin-bottom:10px;
+}
+.ann-star { font-size:36px; animation:bounce 1s ease-in-out infinite alternate; margin-bottom:24px; }
+.ann-next { font-size:12px; color:rgba(199,168,135,0.3); letter-spacing:2px; }
 </style>
 </head>
 <body>
@@ -311,6 +340,15 @@ canvas#confetti-cv { position:fixed; inset:0; pointer-events:none; z-index:101; 
       <div class="win-needle"></div>
       <canvas id="win-canvas" width="300" height="300"></canvas>
     </div>
+  </div>
+
+  <!-- Winner announcement view -->
+  <div id="win-announce">
+    <div class="ann-label">UFUQ · قاب حلم 2026</div>
+    <div class="ann-title" id="ann-title">تم اختيار الفائز الأول</div>
+    <div class="ann-star">✦</div>
+    <div class="ann-name" id="ann-name"></div>
+    <div class="ann-next">في انتظار الاختيار التالي…</div>
   </div>
 
   <!-- Celebration view -->
@@ -676,14 +714,18 @@ let _winners         = [];
 let _spinning        = false;
 let _startAngle      = 0;
 
-const winOverlay  = document.getElementById('winner-overlay');
-const winSpinView = document.getElementById('win-spin-view');
-const winCelebEl  = document.getElementById('win-celebrate');
-const winCanvas   = document.getElementById('win-canvas');
-const winCtx      = winCanvas.getContext('2d');
-const winProgress = document.getElementById('win-progress');
-const confettiCv  = document.getElementById('confetti-cv');
-const confettiCtx = confettiCv.getContext('2d');
+const winOverlay   = document.getElementById('winner-overlay');
+const winSpinView  = document.getElementById('win-spin-view');
+const winAnnounce  = document.getElementById('win-announce');
+const winCelebEl   = document.getElementById('win-celebrate');
+const winCanvas    = document.getElementById('win-canvas');
+const winCtx       = winCanvas.getContext('2d');
+const winProgress  = document.getElementById('win-progress');
+const confettiCv   = document.getElementById('confetti-cv');
+const confettiCtx  = confettiCv.getContext('2d');
+
+const ARABIC_ORDINALS = ['الأول','الثاني','الثالث','الرابع','الخامس','السادس','السابع','الثامن','التاسع','العاشر'];
+function ordinal(n) { return ARABIC_ORDINALS[n - 1] || `#${n}`; }
 
 // ── Elegant wheel draw ──────────────────────────────────
 function drawWinWheel(angle) {
@@ -808,13 +850,26 @@ function collectWinner(finalAngle) {
   _winners.push(winner);
   _winParticipants.splice(idx, 1);
   _startAngle = 0;
-  drawWinWheel(0);
 
-  if (_winners.length < _winCount) {
-    winProgress.textContent = `✦ تم اختيار الفائز ${_winners.length} — في انتظار الاختيار التالي`;
-  } else {
-    winProgress.textContent = '';
-    setTimeout(showCelebration, 600);
+  // Show winner announcement
+  document.getElementById('ann-title').textContent = `تم اختيار الفائز ${ordinal(_winners.length)}`;
+  document.getElementById('ann-name').textContent  = winner;
+  // Force re-trigger animation
+  const nameEl = document.getElementById('ann-name');
+  nameEl.style.animation = 'none';
+  nameEl.offsetHeight; // reflow
+  nameEl.style.animation = '';
+
+  winSpinView.style.display  = 'none';
+  winAnnounce.style.display  = 'none';
+  winAnnounce.classList.remove('show');
+  void winAnnounce.offsetHeight;
+  winAnnounce.style.display  = 'flex';
+  winAnnounce.classList.add('show');
+
+  if (_winners.length >= _winCount) {
+    // Last winner — show celebration after a moment
+    setTimeout(showCelebration, 2800);
   }
 }
 
@@ -822,6 +877,8 @@ function collectWinner(finalAngle) {
 function showCelebration(names) {
   const list = names || _winners;
   winSpinView.style.display  = 'none';
+  winAnnounce.style.display  = 'none';
+  winAnnounce.classList.remove('show');
   winCelebEl.style.display   = 'flex';
   winCelebEl.classList.add('show');
 
@@ -928,11 +985,18 @@ function pollWinnerMode() {
         const serverCount = Number(cfg.spinTriggerCount) || 0;
         if (serverCount > _localTriggerCount && !_spinning && _winners.length < _winCount) {
           _localTriggerCount = serverCount;
+          // Hide announcement if showing, go back to wheel then spin
+          winAnnounce.classList.remove('show');
+          winAnnounce.style.display = 'none';
+          winSpinView.style.display = 'flex';
+          drawWinWheel(0);
           triggerSpin();
         }
       } else if (!on && _winnerMode) {
         _winnerMode = false;
         winOverlay.classList.remove('active');
+        winAnnounce.classList.remove('show');
+        winAnnounce.style.display = 'none';
         if (_winAnimFrame)  cancelAnimationFrame(_winAnimFrame);
         if (_confettiReq)   cancelAnimationFrame(_confettiReq);
         confettiCtx.clearRect(0, 0, confettiCv.width, confettiCv.height);
