@@ -311,7 +311,6 @@ canvas#confetti-cv { position:fixed; inset:0; pointer-events:none; z-index:101; 
       <div class="win-needle"></div>
       <canvas id="win-canvas" width="300" height="300"></canvas>
     </div>
-    <button class="win-pick-btn" id="win-pick-btn" onclick="triggerSpin()" disabled>اختيار الفائز</button>
   </div>
 
   <!-- Celebration view -->
@@ -766,15 +765,10 @@ function drawWinWheel(angle) {
 }
 
 // ── Spin logic ──────────────────────────────────────────
-const winPickBtn = document.getElementById('win-pick-btn');
-
-function setPickBtn(enabled) {
-  winPickBtn.disabled = !enabled;
-}
+let _localTriggerCount = 0;
 
 function triggerSpin() {
   if (_spinning || _winners.length >= _winCount) return;
-  setPickBtn(false);
   startSpin();
 }
 
@@ -817,8 +811,7 @@ function collectWinner(finalAngle) {
   drawWinWheel(0);
 
   if (_winners.length < _winCount) {
-    winProgress.textContent = `✦ تم اختيار الفائز ${_winners.length} — اضغط لاختيار التالي`;
-    setPickBtn(true);
+    winProgress.textContent = `✦ تم اختيار الفائز ${_winners.length} — في انتظار الاختيار التالي`;
   } else {
     winProgress.textContent = '';
     setTimeout(showCelebration, 600);
@@ -904,10 +897,11 @@ function pollWinnerMode() {
     .then(cfg => {
       const on = !!cfg.winnerMode;
       if (on && !_winnerMode) {
-        _winnerMode = true;
-        _winners    = [];
-        _startAngle = 0;
-        _winCount   = Number(cfg.winnerCount) || 3;
+        _winnerMode         = true;
+        _winners            = [];
+        _startAngle         = 0;
+        _winCount           = Number(cfg.winnerCount) || 3;
+        _localTriggerCount  = Number(cfg.spinTriggerCount) || 0;
         winOverlay.classList.add('active');
 
         if (cfg.winnersDone && cfg.winnersList && cfg.winnersList.length) {
@@ -926,9 +920,15 @@ function pollWinnerMode() {
               winCelebEl.style.display  = 'none';
               winCelebEl.classList.remove('show');
               drawWinWheel(0);
-              winProgress.textContent = 'اضغط اختيار الفائز للبدء';
-              setPickBtn(true);
+              winProgress.textContent = 'في انتظار إشارة الاختيار…';
             });
+        }
+      } else if (on && _winnerMode) {
+        // Already active — check if admin triggered a new spin
+        const serverCount = Number(cfg.spinTriggerCount) || 0;
+        if (serverCount > _localTriggerCount && !_spinning && _winners.length < _winCount) {
+          _localTriggerCount = serverCount;
+          triggerSpin();
         }
       } else if (!on && _winnerMode) {
         _winnerMode = false;
