@@ -810,7 +810,11 @@ function collectWinner(finalAngle) {
   const arc = (Math.PI * 2) / n;
   const norm = ((-finalAngle - Math.PI / 2) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
   const idx  = Math.floor(norm / arc) % n;
-  _winners.push(_winParticipants[idx]);
+  const winner = _winParticipants[idx];
+  _winners.push(winner);
+  _winParticipants.splice(idx, 1);
+  _startAngle = 0;
+  drawWinWheel(0);
 
   if (_winners.length < _winCount) {
     winProgress.textContent = `✦ تم اختيار الفائز ${_winners.length} — اضغط لاختيار التالي`;
