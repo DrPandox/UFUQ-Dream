@@ -279,6 +279,17 @@ canvas#confetti-cv { position:fixed; inset:0; pointer-events:none; z-index:101; 
   color:var(--cream); font-weight:700;
   text-shadow:0 0 20px rgba(199,168,135,0.3);
 }
+.win-pick-btn {
+  margin-top:20px; padding:16px 48px;
+  background:linear-gradient(135deg,#c7a887,#907055);
+  color:#38040f; font-family:var(--f-display); font-size:18px; font-weight:700;
+  border:none; border-radius:14px; cursor:pointer;
+  box-shadow:0 4px 30px rgba(199,168,135,0.4);
+  transition:opacity 0.2s, transform 0.1s;
+  -webkit-tap-highlight-color:transparent;
+}
+.win-pick-btn:active { transform:scale(0.96); }
+.win-pick-btn:disabled { opacity:0.4; cursor:not-allowed; transform:none; }
 </style>
 </head>
 <body>
@@ -300,6 +311,7 @@ canvas#confetti-cv { position:fixed; inset:0; pointer-events:none; z-index:101; 
       <div class="win-needle"></div>
       <canvas id="win-canvas" width="300" height="300"></canvas>
     </div>
+    <button class="win-pick-btn" id="win-pick-btn" onclick="triggerSpin()">اختيار الفائز</button>
   </div>
 
   <!-- Celebration view -->
@@ -754,20 +766,31 @@ function drawWinWheel(angle) {
 }
 
 // ── Spin logic ──────────────────────────────────────────
+const winPickBtn = document.getElementById('win-pick-btn');
+
+function setPickBtn(enabled) {
+  winPickBtn.disabled = !enabled;
+}
+
+function triggerSpin() {
+  if (_spinning || _winners.length >= _winCount) return;
+  setPickBtn(false);
+  startSpin();
+}
+
 function startSpin() {
   if (_spinning || !_winParticipants.length) return;
   _spinning = true;
-  const remaining = _winCount - _winners.length;
   winProgress.textContent = `الفائز ${_winners.length + 1} من ${_winCount}`;
 
-  const duration   = 4000 + Math.random() * 2000;
-  const totalRot   = Math.PI * 2 * (10 + Math.random() * 5);
-  const initAngle  = _startAngle;
-  const startTime  = performance.now();
+  const duration  = 4000 + Math.random() * 2000;
+  const totalRot  = Math.PI * 2 * (10 + Math.random() * 5);
+  const initAngle = _startAngle;
+  const startTime = performance.now();
 
   function animate(now) {
     const t    = Math.min((now - startTime) / duration, 1);
-    const ease = 1 - Math.pow(1 - t, 5); // quintic ease-out
+    const ease = 1 - Math.pow(1 - t, 5);
     const a    = initAngle + ease * totalRot;
     drawWinWheel(a);
     if (t < 1) {
@@ -785,17 +808,14 @@ function startSpin() {
 function collectWinner(finalAngle) {
   const n   = _winParticipants.length;
   const arc = (Math.PI * 2) / n;
-  // Needle is at top (pointing down into wheel at -π/2)
   const norm = ((-finalAngle - Math.PI / 2) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
   const idx  = Math.floor(norm / arc) % n;
   _winners.push(_winParticipants[idx]);
 
   if (_winners.length < _winCount) {
-    // More winners needed — spin again after short pause
-    winProgress.textContent = `✦ تم اختيار الفائز ${_winners.length} — جاري اختيار التالي…`;
-    setTimeout(startSpin, 1800);
+    winProgress.textContent = `✦ تم اختيار الفائز ${_winners.length} — اضغط لاختيار التالي`;
+    setPickBtn(true);
   } else {
-    // All winners picked — show celebration
     winProgress.textContent = '';
     setTimeout(showCelebration, 600);
   }
@@ -878,13 +898,13 @@ function pollWinnerMode() {
           .then(r => r.json())
           .then(names => {
             _winParticipants = names.length ? names : ['مشارك'];
-            // Reset views
             winSpinView.style.display = 'flex';
             winCelebEl.style.display  = 'none';
             winCelebEl.classList.remove('show');
             drawWinWheel(0);
+            winProgress.textContent = 'اضغط اختيار الفائز للبدء';
+            setPickBtn(true);
             winOverlay.classList.add('active');
-            setTimeout(startSpin, 1200);
           });
       } else if (!on && _winnerMode) {
         _winnerMode = false;
