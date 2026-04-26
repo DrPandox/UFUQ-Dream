@@ -161,6 +161,29 @@ body {
 .pub-sub {
   font-size:13px; color:#833943;
 }
+.pub-caption-box {
+  margin:16px 0 8px; background:rgba(199,168,135,0.07);
+  border:1px solid rgba(199,168,135,0.25); border-radius:12px;
+  padding:14px 16px; text-align:right; direction:ltr;
+  font-size:14px; color:var(--cream); line-height:1.7;
+  word-break:break-all; user-select:all;
+}
+.pub-copy-btn {
+  width:100%; background:rgba(199,168,135,0.12);
+  border:1px solid rgba(199,168,135,0.3); border-radius:10px;
+  color:var(--gold); font-family:var(--f-body); font-size:14px;
+  padding:12px; cursor:pointer; margin-bottom:8px;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  transition:background 0.2s;
+}
+.pub-copy-btn:active { background:rgba(199,168,135,0.25); }
+.pub-ig-btn {
+  width:100%; background:linear-gradient(135deg,#833943,#5a1020);
+  border:none; border-radius:10px;
+  color:#fff; font-family:var(--f-body); font-size:14px;
+  padding:12px; cursor:pointer; margin-bottom:8px;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+}
 
 /* Ambient particles */
 .sp { position:fixed; inset:0; pointer-events:none; z-index:1; overflow:hidden; }
@@ -187,40 +210,74 @@ body {
 /* ── Winner spin overlay ── */
 #winner-overlay {
   display:none; position:fixed; inset:0; z-index:100;
-  background:radial-gradient(ellipse at center, #3a0010 0%, #1a0008 100%);
+  background:radial-gradient(ellipse at 50% 40%, #2a0010 0%, #0e0005 100%);
   flex-direction:column; align-items:center; justify-content:center;
-  padding:24px;
+  padding:20px; overflow:hidden;
 }
 #winner-overlay.active { display:flex; }
+
+/* Spin view */
+#win-spin-view { display:flex; flex-direction:column; align-items:center; width:100%; }
+.win-header { text-align:center; margin-bottom:16px; }
 .win-title {
-  font-family:var(--f-display); font-size:clamp(22px,6vw,32px);
-  color:var(--gold); margin-bottom:4px; text-align:center;
+  font-family:var(--f-display); font-size:clamp(20px,5vw,28px);
+  color:var(--gold); letter-spacing:2px;
+  text-shadow:0 0 30px rgba(199,168,135,0.4);
 }
-.win-sub { font-size:13px; color:#833943; margin-bottom:24px; text-align:center; }
-.win-wheel-wrap { position:relative; margin-bottom:20px; }
+.win-sub { font-size:12px; color:rgba(199,168,135,0.4); margin-top:4px; letter-spacing:3px; text-transform:uppercase; }
+.win-progress { font-size:14px; color:rgba(199,168,135,0.6); margin-top:6px; font-family:var(--f-body); min-height:20px; }
+
+.win-wheel-wrap {
+  position:relative; margin-bottom:16px;
+  filter:drop-shadow(0 0 40px rgba(199,168,135,0.15));
+}
+/* Needle — elegant diamond pointer */
 .win-needle {
-  position:absolute; top:-18px; left:50%; transform:translateX(-50%);
-  font-size:32px; line-height:1; filter:drop-shadow(0 2px 6px rgba(0,0,0,0.7));
+  position:absolute; top:-12px; left:50%; transform:translateX(-50%);
+  width:0; height:0;
+  border-left:10px solid transparent;
+  border-right:10px solid transparent;
+  border-top:22px solid #c8a45a;
+  filter:drop-shadow(0 2px 8px rgba(199,168,135,0.8));
+  z-index:2;
 }
-.win-result {
-  text-align:center; min-height:80px;
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
+
+/* Celebration view */
+#win-celebrate {
+  display:none; flex-direction:column; align-items:center;
+  width:100%; animation:celebIn 0.7s cubic-bezier(0.34,1.56,0.64,1) both;
 }
-.win-winner-name {
-  font-family:var(--f-display); font-size:clamp(28px,8vw,48px);
-  color:var(--gold-l); font-weight:700; margin-bottom:6px;
-  animation:winPop 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+@keyframes celebIn {
+  0%   { transform:scale(0.7) translateY(30px); opacity:0; }
+  100% { transform:scale(1)   translateY(0);    opacity:1; }
 }
-@keyframes winPop {
-  0%   { transform:scale(0.4); opacity:0; }
-  100% { transform:scale(1);   opacity:1; }
+#win-celebrate.show { display:flex; }
+canvas#confetti-cv { position:fixed; inset:0; pointer-events:none; z-index:101; }
+.celeb-crown { font-size:52px; margin-bottom:8px; animation:bounce 1s ease-in-out infinite alternate; }
+@keyframes bounce { from { transform:translateY(0); } to { transform:translateY(-10px); } }
+.celeb-title {
+  font-family:var(--f-display); font-size:clamp(24px,7vw,36px);
+  color:var(--gold); margin-bottom:4px; text-align:center;
+  text-shadow:0 0 40px rgba(199,168,135,0.5);
 }
-.win-again-btn {
-  margin-top:20px; background:linear-gradient(135deg,#c7a887,#907055);
-  color:#38040f; font-family:var(--f-display); font-size:16px;
-  font-weight:700; padding:13px 36px; border-radius:10px; border:none;
-  cursor:pointer; -webkit-tap-highlight-color:transparent;
-  box-shadow:0 4px 20px rgba(199,168,135,0.3);
+.celeb-sub { font-size:12px; color:rgba(199,168,135,0.4); letter-spacing:3px; margin-bottom:24px; }
+.celeb-list { display:flex; flex-direction:column; gap:12px; width:100%; max-width:340px; }
+.celeb-card {
+  background:linear-gradient(135deg, rgba(199,168,135,0.08), rgba(199,168,135,0.03));
+  border:1px solid rgba(199,168,135,0.25);
+  border-radius:14px; padding:14px 20px;
+  display:flex; align-items:center; gap:14px;
+  animation:cardIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+@keyframes cardIn {
+  0%   { transform:translateX(40px); opacity:0; }
+  100% { transform:translateX(0);    opacity:1; }
+}
+.celeb-medal { font-size:28px; flex-shrink:0; }
+.celeb-name {
+  font-family:var(--f-display); font-size:clamp(18px,5vw,24px);
+  color:var(--cream); font-weight:700;
+  text-shadow:0 0 20px rgba(199,168,135,0.3);
 }
 </style>
 </head>
@@ -228,15 +285,31 @@ body {
 
 <canvas id="starsBg"></canvas>
 
-<!-- Winner spin overlay — shown when admin activates winner mode -->
+<!-- Winner spin overlay -->
+<canvas id="confetti-cv"></canvas>
 <div id="winner-overlay">
-  <div class="win-title">🏆 اختيار الفائز</div>
-  <p class="win-sub">قاب حلم 2026 — @ufuq</p>
-  <div class="win-wheel-wrap">
-    <div class="win-needle">▼</div>
-    <canvas id="win-canvas" width="300" height="300"></canvas>
+
+  <!-- Spin view -->
+  <div id="win-spin-view">
+    <div class="win-header">
+      <div class="win-title">قاب حلم ✦ 2026</div>
+      <div class="win-sub">UFUQ · اختيار الفائزين</div>
+      <div class="win-progress" id="win-progress"></div>
+    </div>
+    <div class="win-wheel-wrap">
+      <div class="win-needle"></div>
+      <canvas id="win-canvas" width="300" height="300"></canvas>
+    </div>
   </div>
-  <div class="win-result" id="win-result"></div>
+
+  <!-- Celebration view -->
+  <div id="win-celebrate">
+    <div class="celeb-crown">🏆</div>
+    <div class="celeb-title">الفائزون</div>
+    <div class="celeb-sub">قاب حلم 2026 · UFUQ</div>
+    <div class="celeb-list" id="celeb-list"></div>
+  </div>
+
 </div>
 
 <div class="sp">
@@ -260,7 +333,7 @@ body {
 
     <div class="sec-lbl">اللحظة الخاصة</div>
     <h2 class="sec-h">التقط صورتك مع الإطار</h2>
-    <p class="sec-sub">شاركها على إنستغرام مع وسم @ufuq</p>
+    <p class="sec-sub">شاركها على إنستغرام مع @ufuqschools @ufuq_primary_school @niubabel</p>
 
     <!-- Step 1: choose photo source -->
     <template v-if="!photoReady && !cameraOn">
@@ -312,9 +385,13 @@ body {
     <!-- Step 4: Published confirmation -->
     <div class="pub-done" v-if="published">
       <div class="pub-check">✨</div>
-      <div class="pub-msg">تم النشر!</div>
-      <p class="pub-sub">شارك الصورة مع @ufuq على إنستغرام</p>
-      <button class="btn-gold" style="margin-top:24px;width:100%;" @click="reset">صورة جديدة</button>
+      <div class="pub-msg">تم حفظ الصورة!</div>
+      <p class="pub-sub">انسخ النص وانشر الصورة على إنستغرام</p>
+      <div class="pub-caption-box" id="share-caption">نحن الآن قاب حلم ✨ @ufuqschools @ufuq_primary_school @niubabel #قاب_حلم_2026</div>
+      <button class="pub-copy-btn" @click="copyCaption">
+        <span>{{ captionCopied ? '✓ تم النسخ' : 'انسخ النص' }}</span>
+      </button>
+      <button class="btn-gold" style="width:100%;margin-bottom:8px;" @click="reset">صورة جديدة</button>
     </div>
 
   </div>
@@ -511,7 +588,7 @@ createApp({
         const objUrl = URL.createObjectURL(blob);
 
         // 3. Try native share (opens Instagram on mobile)
-        const shareText = 'نحن الآن قاب حلم ✨ @ufuq #قاب_حلم_2026';
+        const shareText = 'نحن الآن قاب حلم ✨ @ufuqschools @ufuq_primary_school @niubabel #قاب_حلم_2026';
         let shared = false;
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           try {
@@ -529,7 +606,7 @@ createApp({
 
         if (!shared) {
           // On desktop or if share wasn't available: show Instagram tip
-          setTimeout(() => alert('تم حفظ الصورة في هاتفك\nافتح إنستغرام وشارك الصورة مع وسم @ufuq'), 500);
+          setTimeout(() => alert('تم حفظ الصورة في هاتفك\nافتح إنستغرام وشارك الصورة مع وسم @ufuqschools @ufuq_primary_school @niubabel'), 500);
         }
 
         published.value = true;
@@ -561,114 +638,258 @@ createApp({
 
 // ══ WINNER SPIN ══════════════════════════════════════════
 const BACKEND_URL_WIN = 'https://138-68-79-195.nip.io';
-const COLORS_W = ['#7a0a2a','#4a0618','#9a1a3a','#c8a45a','#3a0414','#8a1a2a','#5a3a00','#6a0a20'];
+
+// Elegant alternating palette: deep crimson ↔ dark gold
+const SECTOR_COLORS = [
+  ['#5a0818','#8a1030'],
+  ['#3a2000','#6a4010'],
+  ['#4a0614','#7a0a24'],
+  ['#2a1800','#5a3808'],
+  ['#3e0610','#6e0a20'],
+  ['#1e1000','#4e2800'],
+];
 
 let _winParticipants = [];
+let _winCount        = 3;
 let _winAnimFrame    = null;
 let _winnerMode      = false;
-let _winnersShown    = [];
+let _winners         = [];
 let _spinning        = false;
+let _startAngle      = 0;
 
-const winOverlay = document.getElementById('winner-overlay');
-const winCanvas  = document.getElementById('win-canvas');
-const winCtx     = winCanvas.getContext('2d');
-const winResult  = document.getElementById('win-result');
+const winOverlay  = document.getElementById('winner-overlay');
+const winSpinView = document.getElementById('win-spin-view');
+const winCelebEl  = document.getElementById('win-celebrate');
+const winCanvas   = document.getElementById('win-canvas');
+const winCtx      = winCanvas.getContext('2d');
+const winProgress = document.getElementById('win-progress');
+const confettiCv  = document.getElementById('confetti-cv');
+const confettiCtx = confettiCv.getContext('2d');
 
+// ── Elegant wheel draw ──────────────────────────────────
 function drawWinWheel(angle) {
   const n = _winParticipants.length;
-  if (n === 0) return;
+  if (!n) return;
   const W = winCanvas.width, H = winCanvas.height;
-  const R = W / 2 - 6, cx = W / 2, cy = H / 2;
+  const R = W / 2 - 4, cx = W / 2, cy = H / 2;
   const arc = (Math.PI * 2) / n;
   winCtx.clearRect(0, 0, W, H);
+
+  // Outer glow ring
+  winCtx.save();
+  winCtx.shadowBlur  = 28;
+  winCtx.shadowColor = 'rgba(199,168,135,0.35)';
+  winCtx.beginPath(); winCtx.arc(cx, cy, R + 2, 0, Math.PI * 2);
+  winCtx.strokeStyle = 'rgba(199,168,135,0.5)'; winCtx.lineWidth = 3; winCtx.stroke();
+  winCtx.restore();
+
   for (let i = 0; i < n; i++) {
     const s = angle + i * arc, e = s + arc;
+    const [c1, c2] = SECTOR_COLORS[i % SECTOR_COLORS.length];
+
+    // Gradient sector
+    const gx1 = cx + Math.cos(s + arc / 2) * R * 0.3;
+    const gy1 = cy + Math.sin(s + arc / 2) * R * 0.3;
+    const gx2 = cx + Math.cos(s + arc / 2) * R;
+    const gy2 = cy + Math.sin(s + arc / 2) * R;
+    const grad = winCtx.createLinearGradient(gx1, gy1, gx2, gy2);
+    grad.addColorStop(0, c1); grad.addColorStop(1, c2);
+
     winCtx.beginPath(); winCtx.moveTo(cx, cy);
     winCtx.arc(cx, cy, R, s, e); winCtx.closePath();
-    winCtx.fillStyle = COLORS_W[i % COLORS_W.length]; winCtx.fill();
-    winCtx.strokeStyle = 'rgba(199,168,135,0.25)'; winCtx.lineWidth = 1; winCtx.stroke();
+    winCtx.fillStyle = grad; winCtx.fill();
+
+    // Divider line
+    winCtx.save();
+    winCtx.strokeStyle = 'rgba(199,168,135,0.18)'; winCtx.lineWidth = 1;
+    winCtx.beginPath(); winCtx.moveTo(cx, cy);
+    winCtx.lineTo(cx + Math.cos(s) * R, cy + Math.sin(s) * R);
+    winCtx.stroke(); winCtx.restore();
+
+    // Diamond accent at rim
+    const dmx = cx + Math.cos(s + arc / 2) * (R - 8);
+    const dmy = cy + Math.sin(s + arc / 2) * (R - 8);
+    winCtx.save();
+    winCtx.translate(dmx, dmy); winCtx.rotate(s + arc / 2);
+    winCtx.fillStyle = 'rgba(199,168,135,0.5)';
+    winCtx.beginPath(); winCtx.arc(0, 0, 2.5, 0, Math.PI * 2); winCtx.fill();
+    winCtx.restore();
+
+    // Name label
     winCtx.save();
     winCtx.translate(cx, cy); winCtx.rotate(s + arc / 2);
-    winCtx.textAlign = 'right'; winCtx.fillStyle = '#f0e4cc';
-    winCtx.font = `bold ${Math.max(9, Math.floor(R * 0.11))}px Cairo,Arial`;
+    winCtx.textAlign = 'right';
+    winCtx.fillStyle = 'rgba(250,247,242,0.88)';
+    winCtx.shadowColor = 'rgba(0,0,0,0.8)'; winCtx.shadowBlur = 6;
+    winCtx.font = `600 ${Math.max(9, Math.floor(R * 0.115))}px "Cairo",Arial`;
     const lbl = _winParticipants[i].length > 7 ? _winParticipants[i].slice(0, 7) + '…' : _winParticipants[i];
-    winCtx.fillText(lbl, R - 10, 5);
+    winCtx.fillText(lbl, R - 14, 5);
     winCtx.restore();
   }
-  winCtx.beginPath(); winCtx.arc(cx, cy, 22, 0, Math.PI * 2);
-  winCtx.fillStyle = '#c8a45a'; winCtx.fill();
-  winCtx.strokeStyle = '#fff'; winCtx.lineWidth = 2.5; winCtx.stroke();
+
+  // Center disc with inner glow
+  const cGrad = winCtx.createRadialGradient(cx, cy, 0, cx, cy, 26);
+  cGrad.addColorStop(0, '#e8d090'); cGrad.addColorStop(1, '#9a7020');
+  winCtx.save();
+  winCtx.shadowBlur = 16; winCtx.shadowColor = 'rgba(199,168,135,0.6)';
+  winCtx.beginPath(); winCtx.arc(cx, cy, 26, 0, Math.PI * 2);
+  winCtx.fillStyle = cGrad; winCtx.fill();
+  winCtx.strokeStyle = 'rgba(255,255,255,0.4)'; winCtx.lineWidth = 2; winCtx.stroke();
+  winCtx.restore();
+  // Star in center
+  winCtx.save();
+  winCtx.translate(cx, cy);
+  winCtx.fillStyle = 'rgba(255,255,255,0.7)';
+  winCtx.font = '14px serif'; winCtx.textAlign = 'center'; winCtx.textBaseline = 'middle';
+  winCtx.fillText('✦', 0, 0);
+  winCtx.restore();
 }
 
+// ── Spin logic ──────────────────────────────────────────
 function startSpin() {
-  if (_spinning || _winParticipants.length === 0) return;
+  if (_spinning || !_winParticipants.length) return;
   _spinning = true;
-  winResult.innerHTML = '';
-  let angle = Math.random() * Math.PI * 2;
-  const duration = 3500 + Math.random() * 2000;
-  const start = performance.now();
+  const remaining = _winCount - _winners.length;
+  winProgress.textContent = `الفائز ${_winners.length + 1} من ${_winCount}`;
+
+  const duration   = 4000 + Math.random() * 2000;
+  const totalRot   = Math.PI * 2 * (10 + Math.random() * 5);
+  const initAngle  = _startAngle;
+  const startTime  = performance.now();
+
   function animate(now) {
-    const t = Math.min((now - start) / duration, 1);
-    const ease = 1 - Math.pow(1 - t, 4); // ease-out quartic
-    const totalRot = (Math.PI * 2) * (8 + Math.random() * 4); // 8-12 full rotations
-    angle = ease * totalRot;
-    drawWinWheel(angle);
+    const t    = Math.min((now - startTime) / duration, 1);
+    const ease = 1 - Math.pow(1 - t, 5); // quintic ease-out
+    const a    = initAngle + ease * totalRot;
+    drawWinWheel(a);
     if (t < 1) {
       _winAnimFrame = requestAnimationFrame(animate);
     } else {
-      _spinning = false;
-      pickWinner(angle);
+      _startAngle = a;
+      _spinning   = false;
+      collectWinner(a);
     }
   }
   if (_winAnimFrame) cancelAnimationFrame(_winAnimFrame);
   requestAnimationFrame(animate);
 }
 
-function pickWinner(finalAngle) {
-  const n = _winParticipants.length;
+function collectWinner(finalAngle) {
+  const n   = _winParticipants.length;
   const arc = (Math.PI * 2) / n;
-  // Needle points up (−π/2), find which slice is at the top
-  const normalized = ((-finalAngle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
-  const idx = Math.floor(normalized / arc) % n;
-  const winner = _winParticipants[idx];
-  _winnersShown.push(winner);
+  // Needle is at top (pointing down into wheel at -π/2)
+  const norm = ((-finalAngle - Math.PI / 2) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
+  const idx  = Math.floor(norm / arc) % n;
+  _winners.push(_winParticipants[idx]);
 
-  const medals = ['🥇','🥈','🥉','🏅','🏅'];
-  const medal  = medals[Math.min(_winnersShown.length - 1, medals.length - 1)];
-  winResult.innerHTML = `
-    <div class="win-winner-name">${medal} ${winner}</div>
-    <button class="win-again-btn" onclick="startSpin()">دورة أخرى ✨</button>`;
+  if (_winners.length < _winCount) {
+    // More winners needed — spin again after short pause
+    winProgress.textContent = `✦ تم اختيار الفائز ${_winners.length} — جاري اختيار التالي…`;
+    setTimeout(startSpin, 1800);
+  } else {
+    // All winners picked — show celebration
+    winProgress.textContent = '';
+    setTimeout(showCelebration, 600);
+  }
 }
 
-// Poll config every 3 seconds to detect winner mode
+// ── Celebration ─────────────────────────────────────────
+function showCelebration() {
+  winSpinView.style.display  = 'none';
+  winCelebEl.style.display   = 'flex';
+  winCelebEl.classList.add('show');
+
+  const medals = ['🥇','🥈','🥉','🏅','🏅','🏅','🏅','🏅','🏅','🏅'];
+  const listEl = document.getElementById('celeb-list');
+  listEl.innerHTML = _winners.map((name, i) => `
+    <div class="celeb-card" style="animation-delay:${i * 0.15 + 0.2}s">
+      <div class="celeb-medal">${medals[i] || '🏅'}</div>
+      <div class="celeb-name">${name}</div>
+    </div>`).join('');
+
+  launchConfetti();
+}
+
+// ── Confetti ─────────────────────────────────────────────
+let _confettiPieces = [];
+let _confettiReq    = null;
+
+function launchConfetti() {
+  confettiCv.width  = window.innerWidth;
+  confettiCv.height = window.innerHeight;
+  _confettiPieces   = [];
+  const COLORS = ['#c8a45a','#e8d090','#890a37','#d4af60','#fff8e0','#7a0020'];
+  for (let i = 0; i < 120; i++) {
+    _confettiPieces.push({
+      x:  Math.random() * confettiCv.width,
+      y: -Math.random() * confettiCv.height,
+      w:  Math.random() * 10 + 4,
+      h:  Math.random() * 5  + 3,
+      r:  Math.random() * Math.PI * 2,
+      vx: (Math.random() - 0.5) * 2,
+      vy: Math.random() * 3 + 2,
+      vr: (Math.random() - 0.5) * 0.15,
+      c:  COLORS[Math.floor(Math.random() * COLORS.length)],
+      a:  1
+    });
+  }
+  function drawConfetti() {
+    confettiCtx.clearRect(0, 0, confettiCv.width, confettiCv.height);
+    let alive = false;
+    for (const p of _confettiPieces) {
+      p.x  += p.vx; p.y += p.vy; p.r += p.vr;
+      if (p.y > confettiCv.height * 0.7) p.a -= 0.018;
+      if (p.a <= 0) continue;
+      alive = true;
+      confettiCtx.save();
+      confettiCtx.globalAlpha = p.a;
+      confettiCtx.translate(p.x, p.y); confettiCtx.rotate(p.r);
+      confettiCtx.fillStyle = p.c;
+      confettiCtx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      confettiCtx.restore();
+    }
+    if (alive) _confettiReq = requestAnimationFrame(drawConfetti);
+    else confettiCtx.clearRect(0, 0, confettiCv.width, confettiCv.height);
+  }
+  if (_confettiReq) cancelAnimationFrame(_confettiReq);
+  requestAnimationFrame(drawConfetti);
+}
+
+// ── Poll config every 3s ─────────────────────────────────
 function pollWinnerMode() {
   fetch(BACKEND_URL_WIN + '/api/config')
     .then(r => r.json())
     .then(cfg => {
       const on = !!cfg.winnerMode;
       if (on && !_winnerMode) {
-        // Entering winner mode — load participants and show overlay
         _winnerMode = true;
-        _winnersShown = [];
+        _winners    = [];
+        _startAngle = 0;
+        _winCount   = Number(cfg.winnerCount) || 3;
         fetch(BACKEND_URL_WIN + '/api/winners/participants')
           .then(r => r.json())
           .then(names => {
             _winParticipants = names.length ? names : ['مشارك'];
+            // Reset views
+            winSpinView.style.display = 'flex';
+            winCelebEl.style.display  = 'none';
+            winCelebEl.classList.remove('show');
             drawWinWheel(0);
             winOverlay.classList.add('active');
-            setTimeout(startSpin, 800); // auto-start first spin
+            setTimeout(startSpin, 1200);
           });
       } else if (!on && _winnerMode) {
-        // Exiting winner mode
         _winnerMode = false;
         winOverlay.classList.remove('active');
-        if (_winAnimFrame) cancelAnimationFrame(_winAnimFrame);
+        if (_winAnimFrame)  cancelAnimationFrame(_winAnimFrame);
+        if (_confettiReq)   cancelAnimationFrame(_confettiReq);
+        confettiCtx.clearRect(0, 0, confettiCv.width, confettiCv.height);
       }
     }).catch(() => {});
 }
 
 setInterval(pollWinnerMode, 3000);
-pollWinnerMode(); // check immediately on load
+pollWinnerMode();
 </script>
 </body>
 </html>
