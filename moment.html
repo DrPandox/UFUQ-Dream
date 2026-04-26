@@ -164,9 +164,9 @@ body {
 .pub-caption-box {
   margin:16px 0 8px; background:rgba(199,168,135,0.07);
   border:1px solid rgba(199,168,135,0.25); border-radius:12px;
-  padding:14px 16px; text-align:right; direction:ltr;
-  font-size:14px; color:var(--cream); line-height:1.7;
-  word-break:break-all; user-select:all;
+  padding:14px 16px; text-align:right; direction:rtl;
+  font-size:14px; color:var(--cream); line-height:2;
+  word-break:break-word; user-select:all;
 }
 .pub-copy-btn {
   width:100%; background:rgba(199,168,135,0.12);
@@ -387,7 +387,7 @@ canvas#confetti-cv { position:fixed; inset:0; pointer-events:none; z-index:101; 
       <div class="pub-check">✨</div>
       <div class="pub-msg">تم حفظ الصورة!</div>
       <p class="pub-sub">انسخ النص وانشر الصورة على إنستغرام</p>
-      <div class="pub-caption-box" id="share-caption">نحن الآن قاب حلم ✨ @ufuqschools @ufuq_primary_school @niubabel #قاب_حلم_2026</div>
+      <div class="pub-caption-box" id="share-caption">نحن الآن قاب حلم ✨ <br>@ufuqschools <br>@ufuq_primary_school <br>@niubabel <br>#قاب_حلم_2026</div>
       <button class="pub-copy-btn" @click="copyCaption">
         <span>{{ captionCopied ? '✓ تم النسخ' : 'انسخ النص' }}</span>
       </button>
@@ -569,7 +569,7 @@ createApp({
 
     // ─── Publish ───
     const captionCopied = Vue.ref(false);
-    const CAPTION = 'نحن الآن قاب حلم ✨ @ufuqschools @ufuq_primary_school @niubabel #قاب_حلم_2026';
+    const CAPTION = 'نحن الآن قاب حلم ✨ \n@ufuqschools \n@ufuq_primary_school \n@niubabel \n#قاب_حلم_2026';
 
     const copyCaption = async () => {
       try {
