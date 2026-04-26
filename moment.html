@@ -822,20 +822,30 @@ function collectWinner(finalAngle) {
 }
 
 // ── Celebration ─────────────────────────────────────────
-function showCelebration() {
+function showCelebration(names) {
+  const list = names || _winners;
   winSpinView.style.display  = 'none';
   winCelebEl.style.display   = 'flex';
   winCelebEl.classList.add('show');
 
   const medals = ['🥇','🥈','🥉','🏅','🏅','🏅','🏅','🏅','🏅','🏅'];
   const listEl = document.getElementById('celeb-list');
-  listEl.innerHTML = _winners.map((name, i) => `
+  listEl.innerHTML = list.map((name, i) => `
     <div class="celeb-card" style="animation-delay:${i * 0.15 + 0.2}s">
       <div class="celeb-medal">${medals[i] || '🏅'}</div>
       <div class="celeb-name">${name}</div>
     </div>`).join('');
 
   launchConfetti();
+
+  // Persist winners to backend so page reload shows celebration
+  if (!names) {
+    fetch(BACKEND_URL_WIN + '/api/winners/done', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ winners: _winners })
+    }).catch(() => {});
+  }
 }
 
 // ── Confetti ─────────────────────────────────────────────
@@ -894,18 +904,28 @@ function pollWinnerMode() {
         _winners    = [];
         _startAngle = 0;
         _winCount   = Number(cfg.winnerCount) || 3;
-        fetch(BACKEND_URL_WIN + '/api/winners/participants')
-          .then(r => r.json())
-          .then(names => {
-            _winParticipants = names.length ? names : ['مشارك'];
-            winSpinView.style.display = 'flex';
-            winCelebEl.style.display  = 'none';
-            winCelebEl.classList.remove('show');
-            drawWinWheel(0);
-            winProgress.textContent = 'اضغط اختيار الفائز للبدء';
-            setPickBtn(true);
-            winOverlay.classList.add('active');
-          });
+        winOverlay.classList.add('active');
+
+        if (cfg.winnersDone && cfg.winnersList && cfg.winnersList.length) {
+          // Winners already picked — go straight to celebration
+          winSpinView.style.display = 'none';
+          winCelebEl.style.display  = 'none';
+          winCelebEl.classList.remove('show');
+          showCelebration(cfg.winnersList);
+        } else {
+          // Fresh session — show wheel, wait for manual picks
+          fetch(BACKEND_URL_WIN + '/api/winners/participants')
+            .then(r => r.json())
+            .then(names => {
+              _winParticipants = names.length ? names : ['مشارك'];
+              winSpinView.style.display = 'flex';
+              winCelebEl.style.display  = 'none';
+              winCelebEl.classList.remove('show');
+              drawWinWheel(0);
+              winProgress.textContent = 'اضغط اختيار الفائز للبدء';
+              setPickBtn(true);
+            });
+        }
       } else if (!on && _winnerMode) {
         _winnerMode = false;
         winOverlay.classList.remove('active');
