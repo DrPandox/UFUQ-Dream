@@ -568,12 +568,23 @@ createApp({
     };
 
     // ─── Publish ───
+    const captionCopied = Vue.ref(false);
+    const CAPTION = 'نحن الآن قاب حلم ✨ @ufuqschools @ufuq_primary_school @niubabel #قاب_حلم_2026';
+
+    const copyCaption = async () => {
+      try {
+        await navigator.clipboard.writeText(CAPTION);
+        captionCopied.value = true;
+        setTimeout(() => captionCopied.value = false, 2500);
+      } catch (_) {}
+    };
+
     const publishFrame = async () => {
       publishing.value = true;
       const cv = fCvRef.value;
 
       try {
-        // 1. Save to DB (fire and forget, don't block UX)
+        // 1. Save to DB
         const name  = localStorage.getItem('guestName')  || 'ضيف';
         const phone = localStorage.getItem('guestPhone') || '';
         fetch(BACKEND_URL + '/api/selfie/publish', {
@@ -582,34 +593,29 @@ createApp({
           body: JSON.stringify({ name, phone })
         }).catch(() => {});
 
-        // 2. Get image blob from canvas
-        const blob = await new Promise(r => cv.toBlob(r, 'image/png'));
-        const file = new File([blob], 'قاب-حلم-2026.png', { type: 'image/png' });
+        // 2. Get image blob
+        const blob   = await new Promise(r => cv.toBlob(r, 'image/png'));
+        const file   = new File([blob], 'قاب-حلم-2026.png', { type: 'image/png' });
         const objUrl = URL.createObjectURL(blob);
 
-        // 3. Try native share (opens Instagram on mobile)
-        const shareText = 'نحن الآن قاب حلم ✨ @ufuqschools @ufuq_primary_school @niubabel #قاب_حلم_2026';
-        let shared = false;
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          try {
-            await navigator.share({ files: [file], title: 'قاب حلم 2026', text: shareText });
-            shared = true;
-          } catch (_) { /* user cancelled share */ }
-        }
+        // 3. Copy caption to clipboard so user can paste it in Instagram
+        await navigator.clipboard.writeText(CAPTION).catch(() => {});
 
-        // 4. Always also download to phone
+        // 4. Download image to phone
         const a = document.createElement('a');
         a.href = objUrl;
         a.download = 'قاب-حلم-2026.png';
         a.click();
         setTimeout(() => URL.revokeObjectURL(objUrl), 3000);
 
-        if (!shared) {
-          // On desktop or if share wasn't available: show Instagram tip
-          setTimeout(() => alert('تم حفظ الصورة في هاتفك\nافتح إنستغرام وشارك الصورة مع وسم @ufuqschools @ufuq_primary_school @niubabel'), 500);
+        // 5. Open native share sheet (on mobile this lets them pick Instagram)
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          navigator.share({ files: [file], title: 'قاب حلم 2026', text: CAPTION }).catch(() => {});
         }
 
-        published.value = true;
+        published.value    = true;
+        captionCopied.value = true;
+        setTimeout(() => captionCopied.value = false, 3000);
       } catch (e) {
         alert('حدث خطأ أثناء النشر. حاول مرة أخرى.');
       } finally {
@@ -623,15 +629,17 @@ createApp({
       photoReady.value = false;
       published.value  = false;
       cameraOn.value   = false;
+      captionCopied.value = false;
     };
 
     return {
       CW, CH,
       photoReady, cameraOn, publishing, published,
+      captionCopied,
       fCvRef, videoRef,
       handleFileUpload,
       startCamera, stopCamera, snapPhoto,
-      publishFrame, reset
+      publishFrame, copyCaption, reset
     };
   }
 }).mount('#app');
