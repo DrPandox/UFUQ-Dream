@@ -633,7 +633,7 @@ createApp({
       const cv = fCvRef.value;
 
       try {
-        // 1. Save to DB
+        // 1. Save to DB (fire and forget)
         const name  = localStorage.getItem('guestName')  || 'ضيف';
         const phone = localStorage.getItem('guestPhone') || '';
         fetch(BACKEND_URL + '/api/selfie/publish', {
@@ -642,27 +642,31 @@ createApp({
           body: JSON.stringify({ name, phone })
         }).catch(() => {});
 
-        // 2. Get image blob
-        const blob   = await new Promise(r => cv.toBlob(r, 'image/png'));
-        const file   = new File([blob], 'قاب-حلم-2026.png', { type: 'image/png' });
-        const objUrl = URL.createObjectURL(blob);
+        // 2. Get blob — use dataURL first (synchronous) to keep user gesture alive on iOS
+        const dataUrl = cv.toDataURL('image/png');
+        const res     = await fetch(dataUrl);
+        const blob    = await res.blob();
+        const file    = new File([blob], 'قاب-حلم-2026.png', { type: 'image/png' });
 
-        // 3. Copy caption to clipboard so user can paste it in Instagram
-        await navigator.clipboard.writeText(CAPTION).catch(() => {});
-
-        // 4. Download image to phone
-        const a = document.createElement('a');
-        a.href = objUrl;
-        a.download = 'قاب-حلم-2026.png';
-        a.click();
-        setTimeout(() => URL.revokeObjectURL(objUrl), 3000);
-
-        // 5. Open native share sheet (on mobile this lets them pick Instagram)
+        // 3. Share sheet FIRST — must be called while user gesture is still fresh on iOS
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share({ files: [file], title: 'قاب حلم 2026', text: CAPTION }).catch(() => {});
+          try {
+            await navigator.share({ files: [file], title: 'قاب حلم 2026', text: CAPTION });
+          } catch (e) {
+            if (e.name !== 'AbortError') {
+              // Share failed — fall back to download
+              _downloadBlob(blob);
+            }
+          }
+        } else {
+          // Desktop or unsupported browser — download
+          _downloadBlob(blob);
         }
 
-        published.value    = true;
+        // 4. Copy caption to clipboard (after share so iOS gesture isn't double-consumed)
+        navigator.clipboard.writeText(CAPTION).catch(() => {});
+
+        published.value     = true;
         captionCopied.value = true;
         setTimeout(() => captionCopied.value = false, 3000);
       } catch (e) {
@@ -671,6 +675,14 @@ createApp({
         publishing.value = false;
       }
     };
+
+    function _downloadBlob(blob) {
+      const url = URL.createObjectURL(blob);
+      const a   = document.createElement('a');
+      a.href = url; a.download = 'قاب-حلم-2026.png';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 3000);
+    }
 
     // ─── Reset ───
     const reset = () => {
