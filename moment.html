@@ -706,13 +706,17 @@ const SECTOR_COLORS = [
   ['#1e1000','#4e2800'],
 ];
 
-let _winParticipants = [];
-let _winCount        = 3;
-let _winAnimFrame    = null;
-let _winnerMode      = false;
-let _winners         = [];
-let _spinning        = false;
-let _startAngle      = 0;
+let _winParticipants  = [];
+let _winCount         = 3;   // total rounds
+let _winnersPerRound  = 1;   // picks per round
+let _winAnimFrame     = null;
+let _winnerMode       = false;
+let _allWinners       = [];  // flat list of all picked winners
+let _roundWinners     = [];  // winners in current round
+let _currentRound     = 0;
+let _picking          = false;
+let _spinning         = false;
+let _startAngle       = 0;
 
 const winOverlay   = document.getElementById('winner-overlay');
 const winSpinView  = document.getElementById('win-spin-view');
@@ -810,14 +814,25 @@ function drawWinWheel(angle) {
 let _localTriggerCount = 0;
 
 function triggerSpin() {
-  if (_spinning || _winners.length >= _winCount) return;
-  startSpin();
+  if (_picking || _currentRound >= _winCount) return;
+  _picking      = true;
+  _currentRound++;
+  _roundWinners = [];
+  winSpinView.style.display = 'flex';
+  winAnnounce.style.display = 'none';
+  winAnnounce.classList.remove('show');
+  pickNextInRound();
 }
 
-function startSpin() {
+function pickNextInRound() {
+  if (!_winParticipants.length) { finishRound(); return; }
+  winProgress.textContent = `الجولة ${_currentRound} من ${_winCount} · الفائز ${_roundWinners.length + 1} من ${_winnersPerRound}`;
+  spinOnce();
+}
+
+function spinOnce() {
   if (_spinning || !_winParticipants.length) return;
   _spinning = true;
-  winProgress.textContent = `الفائز ${_winners.length + 1} من ${_winCount}`;
 
   const duration  = 4000 + Math.random() * 2000;
   const totalRot  = Math.PI * 2 * (10 + Math.random() * 5);
@@ -834,48 +849,72 @@ function startSpin() {
     } else {
       _startAngle = a;
       _spinning   = false;
-      collectWinner(a);
+      collectOneWinner(a);
     }
   }
   if (_winAnimFrame) cancelAnimationFrame(_winAnimFrame);
   requestAnimationFrame(animate);
 }
 
-function collectWinner(finalAngle) {
-  const n   = _winParticipants.length;
-  const arc = (Math.PI * 2) / n;
+function collectOneWinner(finalAngle) {
+  const n    = _winParticipants.length;
+  const arc  = (Math.PI * 2) / n;
   const norm = ((-finalAngle - Math.PI / 2) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
   const idx  = Math.floor(norm / arc) % n;
   const winner = _winParticipants[idx];
-  _winners.push(winner);
+  _roundWinners.push(winner);
+  _allWinners.push(winner);
   _winParticipants.splice(idx, 1);
   _startAngle = 0;
+  drawWinWheel(0);
 
-  // Show winner announcement
-  document.getElementById('ann-title').textContent = `تم اختيار الفائز ${ordinal(_winners.length)}`;
-  document.getElementById('ann-name').textContent  = winner;
-  // Force re-trigger animation
+  if (_roundWinners.length < _winnersPerRound && _winParticipants.length) {
+    // More picks needed in this round — brief pause then spin again
+    winProgress.textContent = `الجولة ${_currentRound} · الفائز ${_roundWinners.length} من ${_winnersPerRound}`;
+    setTimeout(pickNextInRound, 1200);
+  } else {
+    finishRound();
+  }
+}
+
+function finishRound() {
+  _picking = false;
+
+  // Build announcement for this round
+  const roundLabel = _winnersPerRound === 1
+    ? `تم اختيار الفائز ${ordinal(_currentRound)}`
+    : `فائزو الجولة ${ordinal(_currentRound)}`;
+
+  document.getElementById('ann-title').textContent = roundLabel;
+
+  // Show all round winners (single or multiple)
   const nameEl = document.getElementById('ann-name');
+  if (_winnersPerRound === 1) {
+    nameEl.textContent = _roundWinners[0];
+    nameEl.style.fontSize = '';
+  } else {
+    nameEl.innerHTML = _roundWinners.map(n => `<div>${n}</div>`).join('');
+    nameEl.style.fontSize = 'clamp(20px,5vw,32px)';
+  }
   nameEl.style.animation = 'none';
-  nameEl.offsetHeight; // reflow
+  nameEl.offsetHeight;
   nameEl.style.animation = '';
 
-  winSpinView.style.display  = 'none';
-  winAnnounce.style.display  = 'none';
+  winSpinView.style.display = 'none';
+  winAnnounce.style.display = 'none';
   winAnnounce.classList.remove('show');
   void winAnnounce.offsetHeight;
-  winAnnounce.style.display  = 'flex';
+  winAnnounce.style.display = 'flex';
   winAnnounce.classList.add('show');
 
-  if (_winners.length >= _winCount) {
-    // Last winner — show celebration after a moment
+  if (_currentRound >= _winCount) {
     setTimeout(showCelebration, 2800);
   }
 }
 
 // ── Celebration ─────────────────────────────────────────
 function showCelebration(names) {
-  const list = names || _winners;
+  const list = names || _allWinners;
   winSpinView.style.display  = 'none';
   winAnnounce.style.display  = 'none';
   winAnnounce.classList.remove('show');
@@ -897,7 +936,7 @@ function showCelebration(names) {
     fetch(BACKEND_URL_WIN + '/api/winners/done', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ winners: _winners })
+      body: JSON.stringify({ winners: _allWinners })
     }).catch(() => {});
   }
 }
@@ -955,20 +994,22 @@ function pollWinnerMode() {
       const on = !!cfg.winnerMode;
       if (on && !_winnerMode) {
         _winnerMode         = true;
-        _winners            = [];
+        _allWinners         = [];
+        _roundWinners       = [];
+        _currentRound       = 0;
+        _picking            = false;
         _startAngle         = 0;
-        _winCount           = Number(cfg.winnerCount) || 3;
+        _winCount           = Number(cfg.winnerCount)     || 3;
+        _winnersPerRound    = Number(cfg.winnersPerRound) || 1;
         _localTriggerCount  = Number(cfg.spinTriggerCount) || 0;
         winOverlay.classList.add('active');
 
         if (cfg.winnersDone && cfg.winnersList && cfg.winnersList.length) {
-          // Winners already picked — go straight to celebration
           winSpinView.style.display = 'none';
           winCelebEl.style.display  = 'none';
           winCelebEl.classList.remove('show');
           showCelebration(cfg.winnersList);
         } else {
-          // Fresh session — show wheel, wait for manual picks
           fetch(BACKEND_URL_WIN + '/api/winners/participants')
             .then(r => r.json())
             .then(names => {
@@ -981,11 +1022,9 @@ function pollWinnerMode() {
             });
         }
       } else if (on && _winnerMode) {
-        // Already active — check if admin triggered a new spin
         const serverCount = Number(cfg.spinTriggerCount) || 0;
-        if (serverCount > _localTriggerCount && !_spinning && _winners.length < _winCount) {
+        if (serverCount > _localTriggerCount && !_picking && _currentRound < _winCount) {
           _localTriggerCount = serverCount;
-          // Hide announcement if showing, go back to wheel then spin
           winAnnounce.classList.remove('show');
           winAnnounce.style.display = 'none';
           winSpinView.style.display = 'flex';
@@ -994,6 +1033,7 @@ function pollWinnerMode() {
         }
       } else if (!on && _winnerMode) {
         _winnerMode = false;
+        _picking    = false;
         winOverlay.classList.remove('active');
         winAnnounce.classList.remove('show');
         winAnnounce.style.display = 'none';
