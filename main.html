@@ -1077,7 +1077,7 @@ createApp({
       cd2.m = toAr((diff2 % 3600000) / 60000);
       cd2.s = toAr((diff2 % 60000) / 1000);
 
-      if (diff === 0 && !eventStarted) {
+      if (diff2 === 0 && !eventStarted) {
         eventStarted = true;
         clearInterval(timerInterval);
         launchEventOverlay();
